@@ -134,6 +134,16 @@ const Navigation = ({
       }}
     >
       <IconButton
+        component={Link}
+        to={cartHref}
+        aria-label={t("nav.cart")}
+        sx={{ display: { xs: "inline-flex", md: "none" } }}
+      >
+        <Badge badgeContent={cartCount} color="secondary">
+          <ShoppingCart sx={{ color: "secondary.main" }} />
+        </Badge>
+      </IconButton>
+      <IconButton
         onClick={handleMobileMenuOpen}
         aria-label="Open menu"
         sx={{ display: { xs: "inline-flex", md: "none" } }}
@@ -273,6 +283,16 @@ const Navigation = ({
             </IconButton>
           </Box>
           <List disablePadding>
+            <ListItemButton
+              component={Link}
+              to={cartHref}
+              onClick={handleMobileMenuClose}
+            >
+              <ListItemText
+                {...mobileDrawerListItemTextProps}
+                primary={t("nav.cart")}
+              />
+            </ListItemButton>
             {isLoggedIn && (
               <>
                 <Box sx={{ px: 2, py: 1.5 }}>
