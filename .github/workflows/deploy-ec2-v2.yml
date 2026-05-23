@@ -1,0 +1,82 @@
+# v2: single ubuntu user + same EC2 key pair as GitHub EC2_SSH_KEY.
+# Manual AWS/GitHub setup: deploy-ver.2/README.md
+name: Deploy to EC2 (v2 — ubuntu)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ec2-v2
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    env:
+      EC2_USER: ubuntu
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Prepare release archive
+        run: |
+          RELEASE_DIR="release-${{ github.sha }}"
+          mkdir -p "$RELEASE_DIR"
+          rsync -a \
+            --exclude node_modules \
+            --exclude .git \
+            --exclude data \
+            --exclude cypress \
+            --exclude 'frontend/node_modules' \
+            --exclude '.env' \
+            --exclude '.env.production' \
+            ./ "$RELEASE_DIR/"
+          echo "RELEASE_DIR=$RELEASE_DIR" >> "$GITHUB_ENV"
+
+      - name: Rsync to EC2
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr --delete
+          path: ${{ env.RELEASE_DIR }}/
+          remote_path: /var/www/gql-book-store/releases/${{ github.sha }}/
+          remote_host: ${{ secrets.EC2_HOST }}
+          remote_user: ubuntu
+          remote_key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Activate release and restart
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: activate-release-v2.sh ${{ github.sha }}
+
+      - name: Smoke test (public URL)
+        if: vars.DEPLOY_BASE_URL != ''
+        env:
+          DEPLOY_BASE_URL: ${{ vars.DEPLOY_BASE_URL }}
+        run: bash deploy-ver.2/smoke-test.sh

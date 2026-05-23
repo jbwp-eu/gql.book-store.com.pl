@@ -1,0 +1,17 @@
+[Unit]
+Description=gql.book-store.com.pl Node app (v2 — ubuntu user)
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/var/www/gql-book-store/current
+Environment=NODE_ENV=production
+EnvironmentFile=/var/www/gql-book-store/shared/.env.production
+ExecStart=/usr/bin/node backend/dist/server.js
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

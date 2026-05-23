@@ -1,0 +1,4 @@
+# Install: sudo visudo -f /etc/sudoers.d/gql-deploy
+# Allow GitHub deploy user to restart only the app service.
+
+deploy ALL=(root) NOPASSWD: /bin/systemctl restart gql-book-store, /bin/systemctl status gql-book-store

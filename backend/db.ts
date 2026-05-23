@@ -10,7 +10,6 @@ if (!existsSync(dataDir)) {
 }
 
 const dbPath = process.env.DB_PATH ?? path.join(dataDir, "store.db");
-console.log('process.env.DB_PATH:', process.env.DB_PATH, 'dbPath:', dbPath);
 const db: InstanceType<typeof Database> = new Database(dbPath);
 export { db };
 

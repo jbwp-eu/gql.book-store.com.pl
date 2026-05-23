@@ -1,0 +1,17 @@
+[Unit]
+Description=gql.book-store.com.pl Node app
+After=network.target
+
+[Service]
+Type=simple
+User=gqlapp
+Group=gqlapp
+WorkingDirectory=/var/www/gql-book-store/current
+Environment=NODE_ENV=production
+EnvironmentFile=/var/www/gql-book-store/shared/.env.production
+ExecStart=/usr/bin/node backend/dist/server.js
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

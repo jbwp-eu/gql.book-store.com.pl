@@ -1,0 +1,12 @@
+# Copy to /etc/caddy/Caddyfile and replace the hostname.
+# Caddy obtains and renews Let's Encrypt certificates automatically.
+
+gql.book-store.com.pl {
+	reverse_proxy 127.0.0.1:4000 {
+		header_up Host {host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+}
+
+# Optional: redirect www or apex — adjust for your zone layout.
