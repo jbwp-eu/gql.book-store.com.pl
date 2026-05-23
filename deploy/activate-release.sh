@@ -9,9 +9,9 @@ RELEASE="$APP_ROOT/releases/$RELEASE_SHA"
 [[ -d "$RELEASE" ]] || { echo "Missing release: $RELEASE"; exit 1; }
 
 cd "$RELEASE"
-ln -sfn ../shared/.env.production .env.production
-ln -sfn ../shared/data data
-ln -sfn ../shared/uploads uploads
+ln -sfn ../../shared/.env.production .env.production
+ln -sfn ../../shared/data data
+ln -sfn ../../shared/uploads uploads
 npm ci --omit=dev
 sudo chown -R gqlapp:gqlapp "$RELEASE"
 ln -sfn "$RELEASE" "$APP_ROOT/current"
