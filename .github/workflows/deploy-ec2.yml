@@ -19,6 +19,7 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
+      - run: npm ci --prefix frontend
       - run: npm run test
 
   deploy:
@@ -36,6 +37,7 @@ jobs:
       - name: Install and build
         run: |
           npm ci
+          npm ci --prefix frontend
           npm run build
 
       - name: Prepare release archive

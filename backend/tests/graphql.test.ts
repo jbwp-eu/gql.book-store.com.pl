@@ -20,6 +20,8 @@ describe("GraphQL HTTP", () => {
     );
     process.env.DB_PATH = dbPath;
     process.env.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "admin123";
+    process.env.STORE_ADDRESS =
+      process.env.STORE_ADDRESS ?? "Test Book Store, Warsaw, Poland";
     try {
       fs.rmSync(dbPath, { force: true });
     } catch {
