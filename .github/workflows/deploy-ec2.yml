@@ -35,6 +35,14 @@ jobs:
           cache: npm
 
       - name: Install and build
+        env:
+          VITE_GRAPHQL_URL: /graphql
+          VITE_IMAGE_BASE_URL: /images
+          VITE_APP_NAME: BookStore
+          VITE_GOOGLE_MAPS_MAP_ID: "4504f8b37365c3d0"
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          VITE_PAYPAL_CLIENT_ID: ${{ secrets.VITE_PAYPAL_CLIENT_ID }}
         run: |
           npm ci
           npm ci --prefix frontend

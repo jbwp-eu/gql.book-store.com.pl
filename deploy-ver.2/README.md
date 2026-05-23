@@ -211,6 +211,11 @@ ssh -i ~/gql-book-store-key.pem ubuntu@<PUBLIC_IP> \
 |--------|--------|
 | `EC2_HOST` | `gql.book-store.com.pl` (or public IP until DNS works) |
 | `EC2_SSH_KEY` | **Entire** contents of `gql-book-store-key.pem` (private key) |
+| `VITE_GOOGLE_MAPS_API_KEY` | Google Maps JavaScript API key (same as local `frontend/.env.local`) |
+| `VITE_STRIPE_PUBLISHABLE_KEY` | Stripe **publishable** key (`pk_…`) for checkout |
+| `VITE_PAYPAL_CLIENT_ID` | PayPal client id for checkout |
+
+CI injects these at **frontend build** time (see `env:` on **Install and build** in `.github/workflows/deploy-ec2-v2.yml`). They are not read from `frontend/.env.local` on the runner.
 
 **No separate `deploy` user.** Workflow uses **`ubuntu`** (fixed in workflow file).
 
