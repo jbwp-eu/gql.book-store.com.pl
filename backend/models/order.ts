@@ -212,6 +212,7 @@ export function deleteOrderById(id: string): boolean {
         quantity: item.quantity,
       }))
     );
+    deleteChatMessagesByOrderId(id);
     const result = del.run(id);
     if (result.changes <= 0) {
       throw new Error("Failed to delete order");
