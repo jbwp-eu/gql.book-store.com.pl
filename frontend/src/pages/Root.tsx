@@ -29,6 +29,7 @@ import {
 import { graphqlJsonHeaders } from "../lib/graphqlHeaders";
 import { graphqlHttpPost } from "../lib/graphqlClient";
 import { useTranslation } from "react-i18next";
+import { blue, green } from "@mui/material/colors";
 
 const STORE_LOCATION_QUERY = `
   query StoreLocation {
@@ -150,6 +151,9 @@ const Root = () => {
               borderLeft: "none",
               borderRight: "none",
               py: 0.5,
+              "& .MuiAlert-message": {
+                color: blue[400],
+              },
             }}
           >
             {t("footer.demoNotice")}
