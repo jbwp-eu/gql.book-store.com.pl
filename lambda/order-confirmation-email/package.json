@@ -1,0 +1,9 @@
+{
+  "name": "gql-book-store-order-confirmation-email",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "nodemailer": "^8.0.2"
+  }
+}

@@ -1161,7 +1161,8 @@ const root = {
     stripePaymentIntentId,
   }: {
     stripePaymentIntentId: string;
-  }) => setOrderPaidByStripePaymentIntentId(stripePaymentIntentId),
+  }) =>
+    setOrderPaidByStripePaymentIntentId(stripePaymentIntentId).order,
   storeLocation: async () => {
     try {
       const coords = await getCoordsForAddress(ADDRESS);

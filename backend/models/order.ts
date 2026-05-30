@@ -323,29 +323,65 @@ export function createOrder(params: {
   return run();
 }
 
+export type SetOrderPaidResult = {
+  order: Order | null;
+  newlyPaid: boolean;
+};
+
 export function setOrderPaidByStripePaymentIntentId(
   stripePaymentIntentId: string
-): Order | null {
+): SetOrderPaidResult {
+  const row = db
+    .prepare(
+      `SELECT ${ORDER_SELECT_FIELDS} FROM orders WHERE stripe_payment_intent_id = ?`
+    )
+    .get(stripePaymentIntentId) as OrderRow | undefined;
+
+  if (!row) {
+    return { order: null, newlyPaid: false };
+  }
+
+  if (Boolean(row.is_paid)) {
+    return { order: mapRowToOrder(row), newlyPaid: false };
+  }
+
   const now = new Date().toISOString();
   const result = db
     .prepare(
       `
       UPDATE orders
       SET is_paid = 1, paid_at = ?
-      WHERE stripe_payment_intent_id = ?
+      WHERE stripe_payment_intent_id = ? AND IFNULL(is_paid, 0) = 0
     `
     )
     .run(now, stripePaymentIntentId);
-  if (result.changes <= 0) return null;
+
+  if (result.changes <= 0) {
+    const current = db
+      .prepare(
+        `SELECT ${ORDER_SELECT_FIELDS} FROM orders WHERE stripe_payment_intent_id = ?`
+      )
+      .get(stripePaymentIntentId) as OrderRow | undefined;
+    return {
+      order: current ? mapRowToOrder(current) : null,
+      newlyPaid: false,
+    };
+  }
+
   logger.info("order marked paid via Stripe", {
     paymentIntentId: stripePaymentIntentId,
   });
-  const row = db
+
+  const updated = db
     .prepare(
       `SELECT ${ORDER_SELECT_FIELDS} FROM orders WHERE stripe_payment_intent_id = ?`
     )
     .get(stripePaymentIntentId) as OrderRow | undefined;
-  return row ? mapRowToOrder(row) : null;
+
+  return {
+    order: updated ? mapRowToOrder(updated) : null,
+    newlyPaid: true,
+  };
 }
 
 /** Removes an unpaid Stripe order and restores stock (e.g. payment failed). */

@@ -2,11 +2,19 @@ import type { AddressInfo } from "node:net";
 import http from "node:http";
 import Stripe from "stripe";
 import type { Express } from "express";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { makeT } from "../i18n/t.js";
+
+const enqueueOrderConfirmationEmail = vi.hoisted(() =>
+  vi.fn().mockResolvedValue(undefined)
+);
+
+vi.mock("../utils/orderConfirmationQueue.js", () => ({
+  enqueueOrderConfirmationEmail,
+}));
 
 /** Preserves exact bytes for Stripe signature verification (supertest may reserialize JSON). */
 function postStripeWebhook(
@@ -88,6 +96,11 @@ describe("Stripe webhooks HTTP", () => {
     await dbReady;
     ({ createOrder } = await import("../models/order.js"));
     ({ findProductById } = await import("../models/product.js"));
+  });
+
+  beforeEach(() => {
+    enqueueOrderConfirmationEmail.mockClear();
+    delete process.env.ORDER_CONFIRMATION_QUEUE_URL;
   });
 
   function signStripeBody(body: object): { raw: string; header: string } {
@@ -240,5 +253,133 @@ describe("Stripe webhooks HTTP", () => {
       .prepare("SELECT is_paid FROM orders WHERE id = ?")
       .get(order.id) as { is_paid: number };
     expect(paid.is_paid).toBe(1);
+    expect(enqueueOrderConfirmationEmail).toHaveBeenCalledTimes(1);
+    expect(enqueueOrderConfirmationEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: order.id,
+        isPaid: true,
+        user: expect.objectContaining({ email: expect.any(String) }),
+      })
+    );
+  });
+
+  it("enqueues confirmation email only once when charge and payment_intent both succeed", async () => {
+    const t = makeT("pl");
+    const piId = `pi_both_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+
+    const order = createOrder({
+      userId: "1",
+      items: [
+        {
+          productId: "aptekarka",
+          title: "Aptekarka",
+          quantity: 1,
+          price: 49.99,
+        },
+      ],
+      shippingAddress: {
+        name: "Both Events",
+        addressLine1: "Street 3",
+        postalCode: "00-003",
+        city: "Gdansk",
+        country: "PL",
+      },
+      paymentMethod: "stripe",
+      stripePaymentIntentId: piId,
+      paypalCaptureId: null,
+      totalPrice: 69.99,
+      t,
+    });
+
+    const chargeBody = {
+      id: `evt_ch_${piId}`,
+      object: "event",
+      type: "charge.succeeded",
+      data: {
+        object: {
+          id: "ch_test",
+          object: "charge",
+          payment_intent: piId,
+        },
+      },
+    };
+    const piBody = {
+      id: `evt_pi_${piId}`,
+      object: "event",
+      type: "payment_intent.succeeded",
+      data: {
+        object: {
+          id: piId,
+          object: "payment_intent",
+        },
+      },
+    };
+
+    const chargeSigned = signStripeBody(chargeBody);
+    const piSigned = signStripeBody(piBody);
+
+    await postStripeWebhook(app, chargeSigned.raw, chargeSigned.header);
+    await postStripeWebhook(app, piSigned.raw, piSigned.header);
+
+    expect(enqueueOrderConfirmationEmail).toHaveBeenCalledTimes(1);
+    expect(enqueueOrderConfirmationEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ id: order.id })
+    );
+  });
+
+  it("does not enqueue when payment_intent.succeeded is replayed for an already paid order", async () => {
+    const t = makeT("pl");
+    const piId = `pi_replay_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+
+    db.prepare("UPDATE products SET count_in_stock = 50 WHERE id = ?").run(
+      "aptekarka"
+    );
+
+    createOrder({
+      userId: "1",
+      items: [
+        {
+          productId: "aptekarka",
+          title: "Aptekarka",
+          quantity: 1,
+          price: 49.99,
+        },
+      ],
+      shippingAddress: {
+        name: "Replay Test",
+        addressLine1: "Street 4",
+        postalCode: "00-004",
+        city: "Poznan",
+        country: "PL",
+      },
+      paymentMethod: "stripe",
+      stripePaymentIntentId: piId,
+      paypalCaptureId: null,
+      totalPrice: 69.99,
+      t,
+    });
+
+    const body = {
+      id: `evt_replay_${piId}`,
+      object: "event",
+      type: "payment_intent.succeeded",
+      data: {
+        object: {
+          id: piId,
+          object: "payment_intent",
+        },
+      },
+    };
+
+    const first = signStripeBody(body);
+    await postStripeWebhook(app, first.raw, first.header);
+    expect(enqueueOrderConfirmationEmail).toHaveBeenCalledTimes(1);
+
+    const replay = signStripeBody({
+      ...body,
+      id: `evt_replay2_${piId}`,
+    });
+    await postStripeWebhook(app, replay.raw, replay.header);
+    expect(enqueueOrderConfirmationEmail).toHaveBeenCalledTimes(1);
   });
 });

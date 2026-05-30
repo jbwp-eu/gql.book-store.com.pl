@@ -27,19 +27,19 @@ chmod 400 ~/gql-book-store-key.pem
 
 **EC2** → **Security groups** → **Create security group**
 
-| Setting | Value |
-|---------|--------|
-| Name | `gql-book-store-sg` |
-| VPC | default (or your VPC) |
+| Setting | Value                 |
+| ------- | --------------------- |
+| Name    | `gql-book-store-sg`   |
+| VPC     | default (or your VPC) |
 
 **Inbound rules:**
 
-| Type | Port | Source | Note |
-|------|------|--------|------|
-| SSH | 22 | My IP | Your laptop |
-| SSH | 22 | `0.0.0.0/0` | *Optional,* only if GitHub Actions must SSH and you accept key-only auth |
-| HTTP | 80 | `0.0.0.0/0` | Caddy + Let's Encrypt |
-| HTTPS | 443 | `0.0.0.0/0` | Caddy |
+| Type  | Port | Source      | Note                                                                     |
+| ----- | ---- | ----------- | ------------------------------------------------------------------------ |
+| SSH   | 22   | My IP       | Your laptop                                                              |
+| SSH   | 22   | `0.0.0.0/0` | _Optional,_ only if GitHub Actions must SSH and you accept key-only auth |
+| HTTP  | 80   | `0.0.0.0/0` | Caddy + Let's Encrypt                                                    |
+| HTTPS | 443  | `0.0.0.0/0` | Caddy                                                                    |
 
 Do **not** open port **4000** to the internet.
 
@@ -49,15 +49,15 @@ Do **not** open port **4000** to the internet.
 
 **EC2** → **Instances** → **Launch instance**
 
-| Setting | Value |
-|---------|--------|
-| Name | `gql-book-store` |
-| AMI | **Ubuntu Server 24.04 LTS** |
-| Instance type | `t3.small` (or `t3.micro`) |
-| Key pair | `gql-book-store-key` |
-| Network | Public subnet, **Auto-assign public IP: Enable** |
-| Security group | `gql-book-store-sg` |
-| Storage | 20–30 GB gp3 |
+| Setting        | Value                                            |
+| -------------- | ------------------------------------------------ |
+| Name           | `gql-book-store`                                 |
+| AMI            | **Ubuntu Server 24.04 LTS**                      |
+| Instance type  | `t3.small` (or `t3.micro`)                       |
+| Key pair       | `gql-book-store-key`                             |
+| Network        | Public subnet, **Auto-assign public IP: Enable** |
+| Security group | `gql-book-store-sg`                              |
+| Storage        | 20–30 GB gp3                                     |
 
 **Launch** → note **Public IPv4** (e.g. `203.0.113.10`).
 
@@ -73,12 +73,12 @@ ssh -i ~/gql-book-store-key.pem ubuntu@<PUBLIC_IP>
 
 **Route 53** → **Hosted zones** → **book-store.pl** → **Create record**
 
-| Field | Value |
-|-------|--------|
+| Field       | Value                   |
+| ----------- | ----------------------- |
 | Record name | `gql.book-store.com.pl` |
-| Record type | **A** |
-| Value | EC2 **Public IPv4** |
-| TTL | 300 |
+| Record type | **A**                   |
+| Value       | EC2 **Public IPv4**     |
+| TTL         | 300                     |
 
 Save. Verify (laptop):
 
@@ -207,13 +207,13 @@ ssh -i ~/gql-book-store-key.pem ubuntu@<PUBLIC_IP> \
 
 **GitHub** → your repo → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**
 
-| Secret | Value |
-|--------|--------|
-| `EC2_HOST` | `gql.book-store.com.pl` (or public IP until DNS works) |
-| `EC2_SSH_KEY` | **Entire** contents of `gql-book-store-key.pem` (private key) |
-| `VITE_GOOGLE_MAPS_API_KEY` | Google Maps JavaScript API key (same as local `frontend/.env.local`) |
-| `VITE_STRIPE_PUBLISHABLE_KEY` | Stripe **publishable** key (`pk_…`) for checkout |
-| `VITE_PAYPAL_CLIENT_ID` | PayPal client id for checkout |
+| Secret                        | Value                                                                |
+| ----------------------------- | -------------------------------------------------------------------- |
+| `EC2_HOST`                    | `gql.book-store.com.pl` (or public IP until DNS works)               |
+| `EC2_SSH_KEY`                 | **Entire** contents of `gql-book-store-key.pem` (private key)        |
+| `VITE_GOOGLE_MAPS_API_KEY`    | Google Maps JavaScript API key (same as local `frontend/.env.local`) |
+| `VITE_STRIPE_PUBLISHABLE_KEY` | Stripe **publishable** key (`pk_…`) for checkout                     |
+| `VITE_PAYPAL_CLIENT_ID`       | PayPal client id for checkout                                        |
 
 CI injects these at **frontend build** time (see `env:` on **Install and build** in `.github/workflows/deploy-ec2-v2.yml`). They are not read from `frontend/.env.local` on the runner.
 
@@ -221,8 +221,8 @@ CI injects these at **frontend build** time (see `env:` on **Install and build**
 
 Optional repository **variable**:
 
-| Variable | Value |
-|----------|--------|
+| Variable          | Value                                                                  |
+| ----------------- | ---------------------------------------------------------------------- |
 | `DEPLOY_BASE_URL` | `https://gql.book-store.com.pl` (enables post-deploy smoke test in CI) |
 
 ---
@@ -286,12 +286,12 @@ Stripe webhook URL: `https://gql.book-store.com.pl/webhooks/stripe`
 
 ## v1 vs v2
 
-| | v1 (`deploy/`) | v2 (`deploy-ver.2/`) |
-|--|----------------|----------------------|
-| AWS / Route 53 | Optional CLI scripts | Console only |
-| Bootstrap | `bootstrap.sh` | Commands in this README |
-| SSH for CI | user `deploy` + separate key | user **`ubuntu`** + EC2 `.pem` |
-| App process user | `gqlapp` | **`ubuntu`** |
+|                  | v1 (`deploy/`)               | v2 (`deploy-ver.2/`)           |
+| ---------------- | ---------------------------- | ------------------------------ |
+| AWS / Route 53   | Optional CLI scripts         | Console only                   |
+| Bootstrap        | `bootstrap.sh`               | Commands in this README        |
+| SSH for CI       | user `deploy` + separate key | user **`ubuntu`** + EC2 `.pem` |
+| App process user | `gqlapp`                     | **`ubuntu`**                   |
 
 ---
 
