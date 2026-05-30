@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-BASE="${DEPLOY_BASE_URL:-https://gql.book-store.com.pl}"
+BASE="${DEPLOY_BASE_URL:-https://gql.book-store.pl}"
 BASE="${BASE%/}"
 echo "==> GET $BASE/"
 curl -sfS "$BASE/" | head -c 200 >/dev/null
