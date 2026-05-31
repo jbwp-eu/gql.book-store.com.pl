@@ -61,6 +61,7 @@ import {
   capturePayPalOrder,
   createPayPalCheckoutOrder,
 } from "../utils/paypal.js";
+import { onOrderNewlyPaid } from "../utils/onOrderNewlyPaid.js";
 import StripeSDK from "stripe";
 
 const ADDRESS = process.env.STORE_ADDRESS ?? "";
@@ -1096,20 +1097,20 @@ const root = {
         throw new GraphQLError(t("paypalAmountMismatch"));
       }
 
-      return withOrderItemImages(
-        createOrder({
-          userId: currentUser.id,
-          items: resolvedItems,
-          shippingAddress: normalizedShippingAddress,
-          paymentMethod: normalizedPaymentMethod,
-          stripePaymentIntentId: null,
-          paypalCaptureId: captured.captureId,
-          isPaid: true,
-          paidAt: new Date().toISOString(),
-          totalPrice: serverTotals.totalPrice,
-          t,
-        })
-      );
+      const order = createOrder({
+        userId: currentUser.id,
+        items: resolvedItems,
+        shippingAddress: normalizedShippingAddress,
+        paymentMethod: normalizedPaymentMethod,
+        stripePaymentIntentId: null,
+        paypalCaptureId: captured.captureId,
+        isPaid: true,
+        paidAt: new Date().toISOString(),
+        totalPrice: serverTotals.totalPrice,
+        t,
+      });
+      onOrderNewlyPaid(order);
+      return withOrderItemImages(order);
     }
 
     return withOrderItemImages(

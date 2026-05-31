@@ -1,6 +1,6 @@
 # Order confirmation email (SQS + Lambda + SMTP)
 
-EC2 enqueues a message when Stripe marks an order paid; Lambda sends the confirmation email via SMTP.
+EC2 enqueues a message when Stripe marks an order paid or when PayPal capture succeeds in `placeOrder`; Lambda sends the confirmation email via SMTP.
 
 For deploy **v2** only ([README.md](README.md)). Uses the same paths as v2 (`/var/www/gql-book-store/shared/.env.production`, `ubuntu` user).
 
@@ -89,8 +89,9 @@ Use **Test** with SQS template and body from `lambda/order-confirmation-email/te
 ## Verify end-to-end
 
 1. Place a Stripe **test** order and complete payment
-2. CloudWatch → Lambda log group → successful invocation
-3. EC2 logs: `order confirmation email enqueued`
-4. Customer receives confirmation email
+2. Place a PayPal **sandbox** order and complete payment
+3. CloudWatch → Lambda log group → successful invocation
+4. EC2 logs: `order confirmation email enqueued`
+5. Customer receives confirmation email
 
 Stripe webhook URL (unchanged): `https://gql.book-store.com.pl/webhooks/stripe`
