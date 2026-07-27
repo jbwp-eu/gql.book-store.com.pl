@@ -1,6 +1,8 @@
 # gql.book-store.com.pl
 
-Sklep internetowy z książkami: katalog, koszyk, checkout, płatności, panel admina oraz chat przy zamówieniu. Monorepo z API GraphQL i SPA React.
+**Język:** Polski | [English](README.en.md)
+
+Full-stackowy sklep z książkami (monorepo): SPA **React 19** + **Vite** z **Material UI**, **Redux Toolkit** i **React Router v7** (data mode); backend **Express** z **GraphQL**, **JWT**, **Socket.IO** (chat przy zamówieniu), **better-sqlite3** i lokalnymi uploadami. Płatności: **Stripe** i **PayPal**. Deploy na **AWS EC2** przez **GitHub Actions** (live: `gql.book-store.com.pl`). Testy: **Cypress**, **Vitest**, **Supertest**. Napisany z pomocą **Cursor**.
 
 ## Co robi aplikacja
 
