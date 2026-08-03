@@ -2,7 +2,7 @@
 
 **Language:** [Polski](README.md) | English
 
-A full-stack online bookstore monorepo: **React 19** + **Vite** SPA with **Material UI**, **Redux Toolkit**, and **React Router v7** (data mode); backend on **Express** with **GraphQL**, **JWT**, **Socket.IO** (order chat), **better-sqlite3**, and local file uploads. Payments via **Stripe** and **PayPal**. Deployed to **AWS EC2** with **GitHub Actions** (live at `gql.book-store.com.pl`). Tested with **Cypress**, **Vitest**, and **Supertest**. Built with the assistance of **Cursor**.
+A full-stack bookstore monorepo: **React 19** + **Vite** (**Material UI**, **Redux Toolkit**, **React Router v7**) and an **Express** **GraphQL** API (**JWT**, **Socket.IO**, **better-sqlite3**, local uploads). **Stripe** and **PayPal**; optional order-confirmation email via **AWS SQS** + **Lambda**. Tests: **Cypress**, **Vitest**, **Supertest**. CI/CD via **GitHub Actions**. Deployed on **AWS EC2**. Built with **Cursor**.
 
 ## What the app does
 
