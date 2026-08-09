@@ -31,7 +31,23 @@ Do **not** put these in GitHub unless you automate `.env.production` creation. C
 - `PAYPAL_CLIENT_*`, `SMTP_*`
 - `GOOGLE_MAPS_API_KEY_geocoding`
 
-Frontend **build-time** `VITE_*` keys: add to `frontend/.env.production` in repo or as workflow `env` if needed (Stripe publishable, PayPal client id, Maps).
+Frontend **build-time** `VITE_*` values are injected by deploy workflows:
+
+| Kind | Name | Notes |
+|------|------|--------|
+| Secret | `VITE_GOOGLE_MAPS_API_KEY` | Maps JavaScript API key |
+| Secret | `VITE_STRIPE_PUBLISHABLE_KEY` | Stripe `pk_…` |
+| Secret | `VITE_PAYPAL_CLIENT_ID` | PayPal client id |
+| **Variable** | `VITE_GOOGLE_MAPS_MAP_ID` | Map ID (all workflows: EC2 v1/v2 + OVH) |
+
+## OVH deploy (`deploy-ovh.yml`)
+
+| Secret | Value |
+|--------|--------|
+| `OVH_HOST` | Hostname or VPS IP |
+| `OVH_SSH_KEY` | Full private SSH key |
+
+Optional variable `OVH_USER` (default `ubuntu`). See [deploy-ovh/README.md](../deploy-ovh/README.md).
 
 ## Optional: GitHub CLI
 

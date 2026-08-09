@@ -219,11 +219,12 @@ CI injects these at **frontend build** time (see `env:` on **Install and build**
 
 **No separate `deploy` user.** Workflow uses **`ubuntu`** (fixed in workflow file).
 
-Optional repository **variable**:
+Repository **variables**:
 
-| Variable          | Value                                                                  |
-| ----------------- | ---------------------------------------------------------------------- |
-| `DEPLOY_BASE_URL` | `https://gql.book-store.com.pl` (enables post-deploy smoke test in CI) |
+| Variable                   | Value                                                                                          |
+| -------------------------- | ---------------------------------------------------------------------------------------------- |
+| `VITE_GOOGLE_MAPS_MAP_ID`  | Google Cloud Map ID (required; used by all deploy workflows at frontend build time)            |
+| `DEPLOY_BASE_URL`          | `https://gql.book-store.com.pl` (enables post-deploy smoke test in CI)                         |
 
 ---
 

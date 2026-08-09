@@ -1,0 +1,9 @@
+# /etc/caddy/Caddyfile — OVH (same as EC2 v2)
+
+gql.book-store.com.pl {
+	reverse_proxy 127.0.0.1:4000 {
+		header_up Host {host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+}

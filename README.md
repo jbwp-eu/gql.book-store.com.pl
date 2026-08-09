@@ -23,7 +23,7 @@ Full-stackowy sklep z książkami (monorepo): **React 19** + **Vite** (**Materia
 | **Frontend** | React 19, Vite, TypeScript, React Router, MUI, Redux Toolkit, i18next, React Hook Form + Zod, Stripe / PayPal JS, Socket.IO client |
 | **Dane** | SQLite (`data/`), uploady obrazów (`uploads/`) |
 | **Testy** | Vitest, Cypress (e2e) |
-| **Produkcja** | EC2, Caddy (HTTPS), GitHub Actions — szczegóły w [DEPLOY.md](DEPLOY.md) |
+| **Produkcja** | EC2 / OVH, Caddy (HTTPS), GitHub Actions — szczegóły w [DEPLOY.md](DEPLOY.md) |
 | **Opcjonalnie** | AWS Lambda + SQS (mail potwierdzenia zamówienia) |
 
 ## Struktura repo
@@ -34,8 +34,9 @@ frontend/         # React SPA (Vite)
 data/             # baza SQLite
 uploads/          # obrazy produktów
 lambda/           # funkcja AWS (maile potwierdzenia)
-deploy/           # deploy v1
-deploy-ver.2/     # deploy v2
+deploy/           # deploy EC2 v1
+deploy-ver.2/     # deploy EC2 v2
+deploy-ovh/       # deploy OVH (ten sam layout co v2)
 cypress/          # testy e2e
 scripts/          # helpery (e2e, pakowanie lambdy)
 ```
@@ -73,4 +74,4 @@ Inne skrypty:
 
 ## Deploy
 
-Zobacz [DEPLOY.md](DEPLOY.md) — dwie ścieżki (v1 ze skryptami / v2 ręcznie w AWS Console).
+Zobacz [DEPLOY.md](DEPLOY.md) — EC2 v1 / EC2 v2 / OVH (wspólny layout `/var/www/gql-book-store`).
