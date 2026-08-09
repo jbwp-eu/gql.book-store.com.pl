@@ -228,6 +228,7 @@ export const commonPl = {
     submit: "Wyślij",
     sending: "Wysyłanie...",
     sendFailed: "Nie udało się wysłać wiadomości.",
+    sendSuccess: "Wiadomość wysłana. Dziękujemy!",
   },
   reviews: {
     writeTitle: "Napisz opinię",

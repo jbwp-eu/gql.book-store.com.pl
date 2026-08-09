@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
@@ -36,6 +36,8 @@ const CONTACT_MUTATION = `
   }
 `;
 
+const SUCCESS_CLOSE_MS = 3000;
+
 const modalStyle = {
   position: "absolute" as const,
   top: "50%",
@@ -59,13 +61,28 @@ const ContactForm = ({ open, onClose }: ContactFormProps) => {
   const [values, setValues] = useState<FormState>(initialState);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClose = () => {
     setErrors({});
     setSubmitError(null);
+    setSubmitSuccess(false);
     onClose();
   };
+
+  useEffect(() => {
+    if (!submitSuccess) return;
+
+    const timer = setTimeout(() => {
+      setErrors({});
+      setSubmitError(null);
+      setSubmitSuccess(false);
+      onClose();
+    }, SUCCESS_CLOSE_MS);
+
+    return () => clearTimeout(timer);
+  }, [submitSuccess, onClose]);
 
   const handleChange =
     (field: keyof FormState) =>
@@ -94,6 +111,8 @@ const ContactForm = ({ open, onClose }: ContactFormProps) => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (submitSuccess) return;
 
     const nextErrors = validate(values);
     setErrors(nextErrors);
@@ -137,7 +156,8 @@ const ContactForm = ({ open, onClose }: ContactFormProps) => {
       }
 
       setValues(initialState);
-      handleClose();
+      setErrors({});
+      setSubmitSuccess(true);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : t("contact.sendFailed");
@@ -150,69 +170,85 @@ const ContactForm = ({ open, onClose }: ContactFormProps) => {
   return (
     <Modal
       open={open}
-      onClose={handleClose}
+      onClose={submitSuccess ? undefined : handleClose}
       aria-labelledby="contact-form-title"
       aria-describedby="contact-form-description"
     >
       <Box component="form" onSubmit={handleSubmit} sx={modalStyle}>
         <Stack spacing={2}>
-          <Typography id="contact-form-title" variant="h6" component="h2">
-            {t("contact.title")}
-          </Typography>
-          <Typography
-            id="contact-form-description"
-            variant="body2"
-            color="text.secondary"
-          >
-            {t("contact.description")}
-          </Typography>
-          <TextField
-            label={t("auth.email")}
-            type="email"
-            name="email"
-            value={values.email}
-            onChange={handleChange("email")}
-            autoFocus
-            fullWidth
-            required
-            error={Boolean(errors.email)}
-            helperText={errors.email}
-          />
-          <TextField
-            label={t("contact.messageLabel")}
-            name="message"
-            value={values.message}
-            onChange={handleChange("message")}
-            fullWidth
-            required
-            multiline
-            minRows={4}
-            error={Boolean(errors.message)}
-            helperText={errors.message}
-          />
-          {submitError && (
-            <Typography variant="body2" color="error">
-              {submitError}
+          {!submitSuccess && (
+            <>
+              <Typography id="contact-form-title" variant="h6" component="h2">
+                {t("contact.title")}
+              </Typography>
+              <Typography
+                id="contact-form-description"
+                variant="body2"
+                color="text.secondary"
+              >
+                {t("contact.description")}
+              </Typography>
+            </>
+          )}
+          {!submitSuccess ? (
+            <>
+              <TextField
+                label={t("auth.email")}
+                type="email"
+                name="email"
+                value={values.email}
+                onChange={handleChange("email")}
+                autoFocus
+                fullWidth
+                required
+                error={Boolean(errors.email)}
+                helperText={errors.email}
+              />
+              <TextField
+                label={t("contact.messageLabel")}
+                name="message"
+                value={values.message}
+                onChange={handleChange("message")}
+                fullWidth
+                required
+                multiline
+                minRows={4}
+                error={Boolean(errors.message)}
+                helperText={errors.message}
+              />
+              {submitError && (
+                <Typography variant="body2" color="error">
+                  {submitError}
+                </Typography>
+              )}
+              <Stack
+                direction="row"
+                spacing={1.5}
+                justifyContent="flex-end"
+                sx={{ pt: 1 }}
+              >
+                <Button
+                  variant="text"
+                  color="inherit"
+                  onClick={handleClose}
+                  disabled={isSubmitting}
+                >
+                  {t("contact.cancel")}
+                </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? t("contact.sending") : t("contact.submit")}
+                </Button>
+              </Stack>
+            </>
+          ) : (
+            <Typography variant="body2" color="success.main" textAlign="center">
+              {t("contact.sendSuccess")}
             </Typography>
           )}
-          <Stack
-            direction="row"
-            spacing={1.5}
-            justifyContent="flex-end"
-            sx={{ pt: 1 }}
-          >
-            <Button
-              variant="text"
-              color="inherit"
-              onClick={handleClose}
-              disabled={isSubmitting}
-            >
-              {t("contact.cancel")}
-            </Button>
-            <Button type="submit" variant="contained" disabled={isSubmitting}>
-              {isSubmitting ? t("contact.sending") : t("contact.submit")}
-            </Button>
-          </Stack>
         </Stack>
       </Box>
     </Modal>

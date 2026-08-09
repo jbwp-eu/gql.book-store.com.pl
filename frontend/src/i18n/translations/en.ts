@@ -228,6 +228,7 @@ export const commonEn = {
     submit: "Submit",
     sending: "Sending...",
     sendFailed: "Failed to send message.",
+    sendSuccess: "Message sent. Thank you!",
   },
   reviews: {
     writeTitle: "Write a review",
