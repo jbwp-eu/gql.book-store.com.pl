@@ -1,0 +1,2 @@
+# Shell scripts must use LF — CRLF breaks shebang on Linux (env: ‘bash\r’)
+*.sh text eol=lf

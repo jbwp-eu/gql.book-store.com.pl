@@ -181,4 +181,12 @@ journalctl -u gql-book-store -e
 
 **SSH from Actions fails:** allow port **49152** for GitHub runners (or `0.0.0.0/0` with key-only auth); `OVH_SSH_KEY` must be the full private key.
 
+**`/usr/bin/env: ‘bash\r’: No such file or directory`:** `activate-release.sh` was saved with Windows CRLF. Scripts in the repo use LF (see `.gitattributes`). Re-install on the VPS:
+
+```bash
+scp -P 49152 deploy-ovh/activate-release.sh ubuntu@<OVH_HOST>:/tmp/
+ssh -p 49152 ubuntu@<OVH_HOST> \
+  'sudo install -m 755 /tmp/activate-release.sh /usr/local/bin/activate-release-ovh.sh'
+```
+
 **502 from Caddy:** `sudo systemctl status gql-book-store` — app not running yet until the first successful deploy.
