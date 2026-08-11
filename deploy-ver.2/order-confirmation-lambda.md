@@ -44,6 +44,18 @@ For deploy **v2** only ([README.md](README.md)). Uses the same paths as v2 (`/va
 2. Name: `gql-book-store-sqs-send-order-confirmation`
 3. Attach to the **EC2 instance IAM role** (recommended for v2; no access keys on the server)
 
+### OVH VPS (access keys)
+
+EC2 instance roles are not available on OVH. Create an **IAM user** with only the policy above, create an access key, then put in `shared/.env.production`:
+
+```
+ORDER_CONFIRMATION_QUEUE_URL=https://sqs.eu-central-1.amazonaws.com/YOUR_ACCOUNT_ID/gql-book-store-order-confirmation
+AWS_REGION=eu-central-1
+AWS_ACCESS_KEY_ID=AKIA...
+AWS_SECRET_ACCESS_KEY=...
+```
+
+Restart `gql-book-store` after editing. Do not commit these keys.
 ## Step 4: Lambda function
 
 1. **Lambda** → **Create function** → Node.js **20.x**, x86_64
@@ -76,6 +88,7 @@ ORDER_CONFIRMATION_QUEUE_URL=https://sqs.eu-central-1.amazonaws.com/YOUR_ACCOUNT
 AWS_REGION=eu-central-1
 ```
 
+On **OVH** also set `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` (IAM user with `sqs:SendMessage`). On **EC2 v2** prefer the instance role and omit the keys.
 Restart:
 
 ```bash

@@ -2,6 +2,7 @@ node_modules
 backend/dist
 .env
 **/.env.production
+!.env.production.example
 data/
 *.db
 lambda/order-confirmation-email/node_modules

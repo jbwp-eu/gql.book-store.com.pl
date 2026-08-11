@@ -14,6 +14,8 @@ describe("orderConfirmationQueue", () => {
     send.mockResolvedValue({});
     delete process.env.ORDER_CONFIRMATION_QUEUE_URL;
     delete process.env.AWS_REGION;
+    delete process.env.AWS_ACCESS_KEY_ID;
+    delete process.env.AWS_SECRET_ACCESS_KEY;
     delete process.env.CURRENCY;
   });
 

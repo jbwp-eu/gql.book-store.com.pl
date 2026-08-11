@@ -60,7 +60,7 @@ sudo chown -R ubuntu:ubuntu /var/www/gql-book-store
 nano /var/www/gql-book-store/shared/.env.production
 ```
 
-Paste from [shared.env.production.example](shared.env.production.example) and fill in secrets. Required for Maps:
+Paste from root [`.env.production.example`](../.env.production.example) (or [shared.env.production.example](shared.env.production.example)) / paste from local `.env` and adjust. Required for Maps:
 
 - `NODE_ENV=production`
 - `DEPLOY_TARGET=ovh` and Stripe pair `STRIPE_*_TEST_MODE_OVH`
@@ -68,6 +68,7 @@ Paste from [shared.env.production.example](shared.env.production.example) and fi
 - `STORE_ADDRESS=…`
 - `FRONTEND_ORIGIN=https://gql.book-store.com.pl`
 - `DB_PATH` / `IMAGE_DIR` as in the example (`shared/data`, `shared/uploads`)
+- Optional order-confirmation email: `ORDER_CONFIRMATION_QUEUE_URL`, `AWS_REGION`, plus `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` (see [order-confirmation-lambda.md](../deploy-ver.2/order-confirmation-lambda.md#ovh-vps-access-keys))
 
 ```bash
 chmod 600 /var/www/gql-book-store/shared/.env.production

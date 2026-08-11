@@ -24,12 +24,13 @@ sudo chmod 600 /home/deploy/.ssh/authorized_keys
 
 ## App secrets (server only)
 
-Do **not** put these in GitHub unless you automate `.env.production` creation. Copy [shared.env.production.example](shared.env.production.example) to `/var/www/gql-book-store/shared/.env.production` on the server and fill in:
+Do **not** put these in GitHub unless you automate `.env.production` creation. On the server copy from root [`.env.production.example`](../.env.production.example) (or paste from local `.env` and adjust) to `/var/www/gql-book-store/shared/.env.production`:
 
 - `JWT_SECRET`, `ADMIN_PASSWORD`
 - `DEPLOY_TARGET` (`ovh` | `aws`) and matching Stripe pair:
   - `STRIPE_SECRET_KEY_TEST_MODE_OVH` / `STRIPE_WEBHOOK_SECRET_TEST_MODE_OVH`
   - `STRIPE_SECRET_KEY_TEST_MODE_AWS` / `STRIPE_WEBHOOK_SECRET_TEST_MODE_AWS`
+- `FRONTEND_ORIGIN`, `IMAGE_BASE_URL`, `DB_PATH`, `IMAGE_DIR`, `TRUST_PROXY`
 - `PAYPAL_CLIENT_*`, `SMTP_*`
 - `GOOGLE_MAPS_API_KEY_geocoding`
 

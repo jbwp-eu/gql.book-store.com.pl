@@ -30,7 +30,9 @@ mkdir -p "$APP_ROOT"/{releases,shared/data,shared/uploads}
 chown -R gqlapp:gqlapp "$APP_ROOT/shared"
 
 if [[ ! -f "$APP_ROOT/shared/.env.production" ]]; then
-  cp "$SCRIPT_DIR/shared.env.production.example" "$APP_ROOT/shared/.env.production"
+  EXAMPLE="$SCRIPT_DIR/../.env.production.example"
+  [[ -f "$EXAMPLE" ]] || EXAMPLE="$SCRIPT_DIR/shared.env.production.example"
+  cp "$EXAMPLE" "$APP_ROOT/shared/.env.production"
   chown gqlapp:gqlapp "$APP_ROOT/shared/.env.production"
   chmod 600 "$APP_ROOT/shared/.env.production"
   echo "Created $APP_ROOT/shared/.env.production — edit secrets before going live"

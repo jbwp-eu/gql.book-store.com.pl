@@ -30,7 +30,17 @@ function getQueueUrl(): string | null {
 function getSqsClient(): SQSClient {
   if (!sqsClient) {
     const region = process.env.AWS_REGION?.trim() || "eu-central-1";
-    sqsClient = new SQSClient({ region });
+    const accessKeyId = process.env.AWS_ACCESS_KEY_ID?.trim();
+    const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY?.trim();
+    // Explicit keys for OVH / local; on EC2 omit them and use the instance role.
+    sqsClient = new SQSClient(
+      accessKeyId && secretAccessKey
+        ? {
+            region,
+            credentials: { accessKeyId, secretAccessKey },
+          }
+        : { region }
+    );
   }
   return sqsClient;
 }

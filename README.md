@@ -53,7 +53,9 @@ npm install
 npm install --prefix frontend
 ```
 
-Skonfiguruj zmienne w `.env` w katalogu głównym (m.in. `PORT`, `ADMIN_PASSWORD`, `DEPLOY_TARGET`, klucze Stripe `STRIPE_*_TEST_MODE_OVH` / `_AWS`, PayPal, SMTP jeśli potrzebne). Frontend w dev: `VITE_DEPLOY_TARGET` oraz `VITE_STRIPE_PUBLISHABLE_KEY_TEST_MODE_OVH` / `_AWS` (np. w `frontend/.env.local`), plus zwykle `VITE_GRAPHQL_URL`.
+Skonfiguruj zmienne w **jednym** pliku `.env` w katalogu głównym (wzór: [`.env.example`](.env.example) — m.in. `PORT`, `ADMIN_PASSWORD`, `DEPLOY_TARGET`, Stripe `STRIPE_*_TEST_MODE_OVH` / `_AWS`, PayPal, SMTP). Frontend w dev: `frontend/.env.local` (`VITE_DEPLOY_TARGET`, `VITE_STRIPE_PUBLISHABLE_KEY_TEST_MODE_OVH` / `_AWS`, `VITE_GRAPHQL_URL`).
+
+Na VPS: skopiuj `.env` → `/var/www/gql-book-store/shared/.env.production` i dostosuj wartości produkcyjne (wzór: [`.env.production.example`](.env.production.example)). Backend przy `NODE_ENV=production` ładuje `.env.production` jeśli istnieje, w przeciwnym razie `.env`.
 
 ```bash
 npm run dev

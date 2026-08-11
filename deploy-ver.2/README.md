@@ -166,11 +166,12 @@ sudo chown -R ubuntu:ubuntu /var/www/gql-book-store
 sudo nano /var/www/gql-book-store/shared/.env.production
 ```
 
-Paste and edit (see [shared.env.production.example](shared.env.production.example)):
+Paste and edit (see root [`.env.production.example`](../.env.production.example) or [shared.env.production.example](shared.env.production.example)):
 
+- Start from local `.env`, then set production URLs / paths
 - `FRONTEND_ORIGIN=https://gql.book-store.pl`
 - `IMAGE_BASE_URL=https://gql.book-store.pl/images`
-- `DEPLOY_TARGET=aws` (EC2) and Stripe keys `STRIPE_*_TEST_MODE_AWS` (plus OVH pair if you keep both accounts in one file)
+- `DEPLOY_TARGET=aws` and Stripe keys `STRIPE_*_TEST_MODE_AWS`
 - `JWT_SECRET`, PayPal, SMTP, etc.
 
 ```bash
