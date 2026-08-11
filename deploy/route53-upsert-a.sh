@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# Upsert Route 53 A record for gql.book-store.com.pl -> EC2 public IP (no Elastic IP).
+# Upsert Route 53 A record for gql.book-store.pl -> EC2 public IP (no Elastic IP).
 #
 # Usage:
 #   export AWS_REGION=eu-central-1
 #   export DEPLOY_HOST=203.0.113.10          # EC2 public IPv4
 #   export R53_ZONE_NAME=book-store.pl       # hosted zone name
-#   export R53_RECORD_NAME=gql.book-store.com.pl
+#   export R53_RECORD_NAME=gql.book-store.pl
 #   bash deploy/route53-upsert-a.sh
 set -euo pipefail
 
 : "${AWS_REGION:=eu-central-1}"
 : "${R53_ZONE_NAME:=book-store.pl}"
-: "${R53_RECORD_NAME:=gql.book-store.com.pl}"
+: "${R53_RECORD_NAME:=gql.book-store.pl}"
 : "${TTL:=300}"
 
 command -v aws >/dev/null || { echo "Install AWS CLI first"; exit 1; }

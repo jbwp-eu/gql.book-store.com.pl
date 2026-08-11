@@ -63,6 +63,7 @@ nano /var/www/gql-book-store/shared/.env.production
 Paste from [shared.env.production.example](shared.env.production.example) and fill in secrets. Required for Maps:
 
 - `NODE_ENV=production`
+- `DEPLOY_TARGET=ovh` and Stripe pair `STRIPE_*_TEST_MODE_OVH`
 - `GOOGLE_MAPS_API_KEY_geocoding=…`
 - `STORE_ADDRESS=…`
 - `FRONTEND_ORIGIN=https://gql.book-store.com.pl`
@@ -127,7 +128,7 @@ ssh -p 49152 ubuntu@<OVH_HOST> \
 
 SSH port is **49152** (`OVH_SSH_PORT` in `deploy-ovh.yml`, same as nest). Use `-p 49152` / `scp -P 49152` locally.
 | `VITE_GOOGLE_MAPS_API_KEY`    | Maps JavaScript API key (frontend build) |
-| `VITE_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key                   |
+| `VITE_STRIPE_PUBLISHABLE_KEY_TEST_MODE_OVH` | Stripe publishable key (OVH Stripe account) |
 | `VITE_PAYPAL_CLIENT_ID`       | PayPal client id                         |
 
 **Variables:**

@@ -94,4 +94,4 @@ Use **Test** with SQS template and body from `lambda/order-confirmation-email/te
 4. EC2 logs: `order confirmation email enqueued`
 5. Customer receives confirmation email
 
-Stripe webhook URL (unchanged): `https://gql.book-store.com.pl/webhooks/stripe`
+Stripe webhook URL (AWS): `https://gql.book-store.pl/webhooks/stripe`

@@ -83,8 +83,10 @@ describe("Stripe webhooks HTTP", () => {
     );
     process.env.DB_PATH = dbPath;
     process.env.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "admin123";
-    process.env.STRIPE_SECRET_KEY = "sk_test_webhook";
-    process.env.STRIPE_WEBHOOK_SECRET = "whsec_test_webhook_secret";
+    process.env.DEPLOY_TARGET = "ovh";
+    process.env.STRIPE_SECRET_KEY_TEST_MODE_OVH = "sk_test_webhook";
+    process.env.STRIPE_WEBHOOK_SECRET_TEST_MODE_OVH =
+      "whsec_test_webhook_secret";
     try {
       fs.rmSync(dbPath, { force: true });
     } catch {
@@ -107,7 +109,7 @@ describe("Stripe webhooks HTTP", () => {
     const raw = JSON.stringify(body);
     const header = Stripe.webhooks.generateTestHeaderString({
       payload: raw,
-      secret: process.env.STRIPE_WEBHOOK_SECRET!,
+      secret: process.env.STRIPE_WEBHOOK_SECRET_TEST_MODE_OVH!,
     });
     return { raw, header };
   }

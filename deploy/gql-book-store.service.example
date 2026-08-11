@@ -1,5 +1,5 @@
 [Unit]
-Description=gql.book-store.com.pl Node app
+Description=gql.book-store.pl Node app
 After=network.target
 
 [Service]

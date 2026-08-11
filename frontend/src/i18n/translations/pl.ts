@@ -129,7 +129,8 @@ export const commonPl = {
     productFallback: "Produkt",
     shipping: "Dostawa",
     payment: "Płatność",
-    stripeKeyMissing: "Brak klucza publicznego Stripe.",
+    stripeKeyMissing:
+      "Brak klucza Stripe (VITE_STRIPE_PUBLISHABLE_KEY_TEST_MODE_OVH / _AWS).",
     paypalKeyMissing: "Brak identyfikatora klienta PayPal.",
     preparingPayment: "Przygotowywanie bezpiecznej płatności...",
     preparingPayPal: "Przygotowywanie płatności PayPal...",

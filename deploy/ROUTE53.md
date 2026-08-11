@@ -1,13 +1,13 @@
-# Route 53 — gql.book-store.com.pl (no Elastic IP)
+# Route 53 — gql.book-store.pl (no Elastic IP)
 
-Point subdomain **gql.book-store.com.pl** at the EC2 **public IPv4**. Re-run after stop/start or instance replacement.
+Point subdomain **gql.book-store.pl** at the EC2 **public IPv4**. Re-run after stop/start or instance replacement.
 
 ## AWS Console
 
 1. **EC2** → Instances → select instance → copy **Public IPv4 address**.
 2. **Route 53** → **Hosted zones** → **book-store.pl**.
 3. **Create record**:
-   - **Record name:** `gql.book-store.com.pl` (or `gql` if the zone is `book-store.com.pl` — match your zone layout)
+   - **Record name:** `gql` (zone `book-store.pl` → FQDN `gql.book-store.pl`)
    - **Record type:** `A`
    - **Value:** EC2 public IPv4 (e.g. `203.0.113.10`)
    - **TTL:** `300`
@@ -17,9 +17,9 @@ Point subdomain **gql.book-store.com.pl** at the EC2 **public IPv4**. Re-run aft
 Verify:
 
 ```bash
-dig +short gql.book-store.com.pl
+dig +short gql.book-store.pl
 # or
-nslookup gql.book-store.com.pl
+nslookup gql.book-store.pl
 ```
 
 ## AWS CLI
@@ -39,7 +39,7 @@ bash deploy/route53-upsert-a.sh
 
 ## GitHub Actions
 
-Set secret **`EC2_HOST`** to `gql.book-store.com.pl` once DNS resolves (preferred over raw IP for TLS and SSH host key stability).
+Set secret **`EC2_HOST`** to `gql.book-store.pl` once DNS resolves (preferred over raw IP for TLS and SSH host key stability).
 
 ## IP changed?
 

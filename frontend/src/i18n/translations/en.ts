@@ -129,7 +129,8 @@ export const commonEn = {
     productFallback: "Product",
     shipping: "Shipping",
     payment: "Payment",
-    stripeKeyMissing: "Stripe publishable key is missing.",
+    stripeKeyMissing:
+      "Missing Stripe key (VITE_STRIPE_PUBLISHABLE_KEY_TEST_MODE_OVH / _AWS).",
     paypalKeyMissing: "PayPal client id is missing.",
     preparingPayment: "Preparing secure payment...",
     preparingPayPal: "Preparing PayPal checkout...",

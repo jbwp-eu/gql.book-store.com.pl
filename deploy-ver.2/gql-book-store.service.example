@@ -1,5 +1,5 @@
 [Unit]
-Description=gql.book-store.com.pl Node app (v2 — ubuntu user)
+Description=gql.book-store.pl Node app (v2 — ubuntu user)
 After=network.target
 
 [Service]

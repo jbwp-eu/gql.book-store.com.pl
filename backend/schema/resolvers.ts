@@ -63,6 +63,7 @@ import {
 } from "../utils/paypal.js";
 import { onOrderNewlyPaid } from "../utils/onOrderNewlyPaid.js";
 import StripeSDK from "stripe";
+import { stripeEnv } from "../utils/stripeEnv.js";
 
 const ADDRESS = process.env.STORE_ADDRESS ?? "";
 const CURRENCY = (process.env.CURRENCY ?? "PLN").toLowerCase();
@@ -70,7 +71,7 @@ const CURRENCY = (process.env.CURRENCY ?? "PLN").toLowerCase();
 let stripeClient: StripeSDK | null = null;
 async function getStripe(t: TranslateFn): Promise<StripeSDK> {
   if (stripeClient) return stripeClient;
-  const key = process.env.STRIPE_SECRET_KEY;
+  const key = stripeEnv("STRIPE_SECRET_KEY_TEST_MODE");
   if (!key) {
     throw new GraphQLError(t("stripeNotConfigured"));
   }

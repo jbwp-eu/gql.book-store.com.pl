@@ -1,5 +1,6 @@
 # v2: single ubuntu user + same EC2 key pair as GitHub EC2_SSH_KEY.
 # Manual AWS/GitHub setup: deploy-ver.2/README.md
+# GitHub Variables: DEPLOY_BASE_URL_AWS (https://gql.book-store.pl)
 name: Deploy to EC2 (v2 — ubuntu)
 
 on:
@@ -44,9 +45,10 @@ jobs:
           VITE_GRAPHQL_URL: /graphql
           VITE_IMAGE_BASE_URL: /images
           VITE_APP_NAME: BookStore
+          VITE_DEPLOY_TARGET: aws
           VITE_GOOGLE_MAPS_MAP_ID: ${{ vars.VITE_GOOGLE_MAPS_MAP_ID }}
           VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
-          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          VITE_STRIPE_PUBLISHABLE_KEY_TEST_MODE_AWS: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY_TEST_MODE_AWS }}
           VITE_PAYPAL_CLIENT_ID: ${{ secrets.VITE_PAYPAL_CLIENT_ID }}
         run: |
           npm ci
@@ -87,7 +89,7 @@ jobs:
           script: activate-release-v2.sh ${{ github.sha }}
 
       - name: Smoke test (public URL)
-        if: vars.DEPLOY_BASE_URL != ''
+        if: vars.DEPLOY_BASE_URL_AWS != ''
         env:
-          DEPLOY_BASE_URL: ${{ vars.DEPLOY_BASE_URL }}
+          DEPLOY_BASE_URL_AWS: ${{ vars.DEPLOY_BASE_URL_AWS }}
         run: bash deploy-ver.2/smoke-test.sh

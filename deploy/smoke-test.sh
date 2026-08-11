@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Smoke test deployed app (run from laptop or CI with DEPLOY_BASE_URL set).
+# Smoke test deployed app (run from laptop or CI with DEPLOY_BASE_URL_AWS set).
+# Legacy: DEPLOY_BASE_URL is still accepted for backward compatibility.
 set -euo pipefail
 
-BASE="${DEPLOY_BASE_URL:-https://gql.book-store.com.pl}"
+BASE="${DEPLOY_BASE_URL_AWS:-${DEPLOY_BASE_URL:-https://gql.book-store.pl}}"
 BASE="${BASE%/}"
 
 echo "==> GET $BASE/"

@@ -1,5 +1,6 @@
 # OVH VPS: same layout as EC2 v2 (/var/www/gql-book-store).
 # Manual server setup: deploy-ovh/README.md
+# GitHub Variables: DEPLOY_BASE_URL_OVH (https://gql.book-store.com.pl)
 name: Deploy to OVH
 
 on:
@@ -43,9 +44,10 @@ jobs:
           VITE_GRAPHQL_URL: /graphql
           VITE_IMAGE_BASE_URL: /images
           VITE_APP_NAME: BookStore
+          VITE_DEPLOY_TARGET: ovh
           VITE_GOOGLE_MAPS_MAP_ID: ${{ vars.VITE_GOOGLE_MAPS_MAP_ID }}
           VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
-          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          VITE_STRIPE_PUBLISHABLE_KEY_TEST_MODE_OVH: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY_TEST_MODE_OVH }}
           VITE_PAYPAL_CLIENT_ID: ${{ secrets.VITE_PAYPAL_CLIENT_ID }}
         run: |
           npm ci

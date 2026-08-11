@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # One-time EC2 bootstrap (Ubuntu 24.04).
 # Copy the whole deploy/ folder to the server, then:
-#   sudo DEPLOY_DOMAIN=gql.book-store.com.pl bash /tmp/deploy/bootstrap.sh
+#   sudo DEPLOY_DOMAIN=gql.book-store.pl bash /tmp/deploy/bootstrap.sh
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_ROOT=/var/www/gql-book-store
-DOMAIN="${DEPLOY_DOMAIN:-gql.book-store.com.pl}"
+DOMAIN="${DEPLOY_DOMAIN:-gql.book-store.pl}"
 
 echo "==> Packages"
 apt-get update
@@ -38,7 +38,7 @@ fi
 
 echo "==> Caddyfile (hostname: $DOMAIN)"
 if [[ -f "$SCRIPT_DIR/Caddyfile.example" ]]; then
-  sed "s/gql.book-store.com.pl/${DOMAIN}/g" "$SCRIPT_DIR/Caddyfile.example" > /etc/caddy/Caddyfile
+  sed "s/gql.book-store.pl/${DOMAIN}/g" "$SCRIPT_DIR/Caddyfile.example" > /etc/caddy/Caddyfile
 else
   cat > /etc/caddy/Caddyfile <<EOF
 ${DOMAIN} {

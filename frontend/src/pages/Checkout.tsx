@@ -29,6 +29,7 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { env } from "../lib/env";
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import { formatMoneyIso } from "../utils/money";
 import { useLocale, useLocalizedHref } from "../hooks/useLocalizedPath";
@@ -213,9 +214,7 @@ const CheckoutPage = () => {
     return <Navigate to={paymentHref} replace />;
   }
 
-  const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as
-    | string
-    | undefined;
+  const stripePublishableKey = env.stripePublishableKey;
   const payPalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID as
     | string
     | undefined;

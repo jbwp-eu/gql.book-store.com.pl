@@ -53,7 +53,7 @@ npm install
 npm install --prefix frontend
 ```
 
-Configure variables in the root `.env` (e.g. `PORT`, `ADMIN_PASSWORD`, Stripe/PayPal keys, SMTP if needed). In development the frontend usually talks to GraphQL via `VITE_GRAPHQL_URL` (e.g. in `frontend/.env.local`).
+Configure variables in the root `.env` (e.g. `PORT`, `ADMIN_PASSWORD`, `DEPLOY_TARGET`, Stripe keys `STRIPE_*_TEST_MODE_OVH` / `_AWS`, PayPal, SMTP if needed). Frontend in dev: `VITE_DEPLOY_TARGET` and `VITE_STRIPE_PUBLISHABLE_KEY_TEST_MODE_OVH` / `_AWS` (e.g. in `frontend/.env.local`), plus usually `VITE_GRAPHQL_URL`.
 
 ```bash
 npm run dev

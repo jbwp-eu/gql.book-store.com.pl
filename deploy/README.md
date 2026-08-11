@@ -1,20 +1,20 @@
-# Deploy gql.book-store.com.pl to EC2 (Caddy + GitHub Actions) — v1
+# Deploy gql.book-store.pl to EC2 (Caddy + GitHub Actions) — v1
 
 Single Ubuntu EC2: **Caddy** (HTTPS) → **Node** on `127.0.0.1:4000`. DNS via **Route 53** (no Elastic IP).
 
-**Alternative (manual console + single `ubuntu` key):** [deploy-ver.2/README.md](../deploy-ver.2/README.md)
+**Alternative (manual console + single** `ubuntu` **key):** [deploy-ver.2/README.md](../deploy-ver.2/README.md)
 
 ## Quick checklist
 
-| Step | Action |
-|------|--------|
-| 1 | Create EC2 ([aws-setup.sh](aws-setup.sh) or AWS Console) |
-| 2 | Route 53 A record → public IP ([route53-upsert-a.sh](route53-upsert-a.sh)) |
-| 3 | `scp -r deploy ubuntu@IP:/tmp/deploy && ssh sudo bash /tmp/deploy/bootstrap.sh` |
-| 4 | Configure deploy SSH key + [GITHUB_SECRETS.md](GITHUB_SECRETS.md) |
-| 5 | Edit `/var/www/gql-book-store/shared/.env.production` |
-| 6 | Push to `main` or run workflow_dispatch |
-| 7 | [smoke-test.sh](smoke-test.sh) |
+| Step | Action                                                                          |
+| ---- | ------------------------------------------------------------------------------- |
+| 1    | Create EC2 ([aws-setup.sh](aws-setup.sh) or AWS Console)                        |
+| 2    | Route 53 A record → public IP ([route53-upsert-a.sh](route53-upsert-a.sh))      |
+| 3    | `scp -r deploy ubuntu@IP:/tmp/deploy && ssh sudo bash /tmp/deploy/bootstrap.sh` |
+| 4    | Configure deploy SSH key + [GITHUB_SECRETS.md](GITHUB_SECRETS.md)               |
+| 5    | Edit `/var/www/gql-book-store/shared/.env.production`                           |
+| 6    | Push to `main` or run workflow_dispatch                                         |
+| 7    | [smoke-test.sh](smoke-test.sh)                                                  |
 
 ---
 
@@ -46,7 +46,7 @@ See [ROUTE53.md](ROUTE53.md) for AWS Console steps.
 export DEPLOY_HOST=<EC2-public-IPv4>
 # or: export INSTANCE_ID=i-xxxxxxxx
 bash deploy/route53-upsert-a.sh
-dig +short gql.book-store.com.pl
+dig +short gql.book-store.pl
 ```
 
 **Note:** Public IP changes if the instance is stopped/started without Elastic IP — re-run this script.
@@ -58,7 +58,7 @@ dig +short gql.book-store.com.pl
 ```bash
 scp -r -i your.pem deploy ubuntu@<public-ip>:/tmp/
 ssh -i your.pem ubuntu@<public-ip> \
-  'sudo DEPLOY_DOMAIN=gql.book-store.com.pl bash /tmp/deploy/bootstrap.sh'
+  'sudo DEPLOY_DOMAIN=gql.book-store.pl bash /tmp/deploy/bootstrap.sh'
 ```
 
 Installs: Node 22, Caddy, `gqlapp` + `deploy` users, systemd unit, sudoers for deploy.
@@ -79,23 +79,25 @@ ssh ubuntu@IP 'sudo nano /var/www/gql-book-store/shared/.env.production'
 
 ## 4. GitHub Actions
 
-Workflow: [`.github/workflows/deploy-ec2.yml`](../.github/workflows/deploy-ec2.yml)
+Workflow: `[.github/workflows/deploy-ec2.yml](../.github/workflows/deploy-ec2.yml)`
 
 Secrets: [GITHUB_SECRETS.md](GITHUB_SECRETS.md)
 
-- `EC2_HOST=gql.book-store.com.pl`
+- `EC2_HOST=gql.book-store.pl`
 - `EC2_USER=deploy`
 - `EC2_SSH_KEY` = private key PEM
+
+Variable (optional smoke test in CI): `DEPLOY_BASE_URL_AWS=https://gql.book-store.pl`
 
 ---
 
 ## 5. Verify
 
 ```bash
-DEPLOY_BASE_URL=https://gql.book-store.com.pl bash deploy/smoke-test.sh
+DEPLOY_BASE_URL_AWS=https://gql.book-store.pl bash deploy/smoke-test.sh
 ```
 
-Stripe webhook: `https://gql.book-store.com.pl/webhooks/stripe`
+Stripe webhook: `https://gql.book-store.pl/webhooks/stripe`
 
 ---
 

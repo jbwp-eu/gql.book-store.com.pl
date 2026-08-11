@@ -6,7 +6,7 @@ Configure under **Settings → Secrets and variables → Actions → New reposit
 
 | Secret | Value |
 |--------|--------|
-| `EC2_HOST` | `gql.book-store.com.pl` (after Route 53 propagates) or EC2 public IP temporarily |
+| `EC2_HOST` | `gql.book-store.pl` (after Route 53 propagates) or EC2 public IP temporarily |
 | `EC2_USER` | `deploy` |
 | `EC2_SSH_KEY` | Full private PEM for the deploy user (include `-----BEGIN...` / `END...` lines) |
 
@@ -27,7 +27,9 @@ sudo chmod 600 /home/deploy/.ssh/authorized_keys
 Do **not** put these in GitHub unless you automate `.env.production` creation. Copy [shared.env.production.example](shared.env.production.example) to `/var/www/gql-book-store/shared/.env.production` on the server and fill in:
 
 - `JWT_SECRET`, `ADMIN_PASSWORD`
-- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+- `DEPLOY_TARGET` (`ovh` | `aws`) and matching Stripe pair:
+  - `STRIPE_SECRET_KEY_TEST_MODE_OVH` / `STRIPE_WEBHOOK_SECRET_TEST_MODE_OVH`
+  - `STRIPE_SECRET_KEY_TEST_MODE_AWS` / `STRIPE_WEBHOOK_SECRET_TEST_MODE_AWS`
 - `PAYPAL_CLIENT_*`, `SMTP_*`
 - `GOOGLE_MAPS_API_KEY_geocoding`
 
@@ -36,9 +38,19 @@ Frontend **build-time** `VITE_*` values are injected by deploy workflows:
 | Kind | Name | Notes |
 |------|------|--------|
 | Secret | `VITE_GOOGLE_MAPS_API_KEY` | Maps JavaScript API key |
-| Secret | `VITE_STRIPE_PUBLISHABLE_KEY` | Stripe `pk_…` |
+| Secret | `VITE_STRIPE_PUBLISHABLE_KEY_TEST_MODE_OVH` | Stripe `pk_…` (OVH deploy) |
+| Secret | `VITE_STRIPE_PUBLISHABLE_KEY_TEST_MODE_AWS` | Stripe `pk_…` (EC2 deploy) |
 | Secret | `VITE_PAYPAL_CLIENT_ID` | PayPal client id |
 | **Variable** | `VITE_GOOGLE_MAPS_MAP_ID` | Map ID (all workflows: EC2 v1/v2 + OVH) |
+
+Workflows also set `VITE_DEPLOY_TARGET` (`ovh` or `aws`) so the SPA picks the matching Stripe publishable key.
+
+## GitHub repository variables (smoke tests)
+
+| Variable | Value |
+|----------|--------|
+| `DEPLOY_BASE_URL_AWS` | `https://gql.book-store.pl` (EC2 workflows v1 + v2) |
+| `DEPLOY_BASE_URL_OVH` | `https://gql.book-store.com.pl` (OVH workflow) |
 
 ## OVH deploy (`deploy-ovh.yml`)
 
@@ -52,7 +64,7 @@ Optional variable `OVH_USER` (default `ubuntu`). See [deploy-ovh/README.md](../d
 ## Optional: GitHub CLI
 
 ```bash
-gh secret set EC2_HOST -b"gql.book-store.com.pl"
+gh secret set EC2_HOST -b"gql.book-store.pl"
 gh secret set EC2_USER -b"deploy"
 gh secret set EC2_SSH_KEY < gql-deploy-key
 ```

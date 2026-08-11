@@ -345,8 +345,10 @@ describe("GraphQL HTTP", () => {
   });
 
   it("returns GraphQL errors for createStripePaymentIntent when Stripe is not configured", async () => {
-    const prevKey = process.env.STRIPE_SECRET_KEY;
-    delete process.env.STRIPE_SECRET_KEY;
+    const prevTarget = process.env.DEPLOY_TARGET;
+    const prevKey = process.env.STRIPE_SECRET_KEY_TEST_MODE_OVH;
+    process.env.DEPLOY_TARGET = "ovh";
+    delete process.env.STRIPE_SECRET_KEY_TEST_MODE_OVH;
     try {
       const password = process.env.ADMIN_PASSWORD ?? "admin";
       const loginRes = await request(app)
@@ -424,10 +426,15 @@ describe("GraphQL HTTP", () => {
       expect(errors!.length).toBeGreaterThan(0);
       expect(errors![0].message).toBe("Stripe is not configured on the server.");
     } finally {
-      if (prevKey === undefined) {
-        delete process.env.STRIPE_SECRET_KEY;
+      if (prevTarget === undefined) {
+        delete process.env.DEPLOY_TARGET;
       } else {
-        process.env.STRIPE_SECRET_KEY = prevKey;
+        process.env.DEPLOY_TARGET = prevTarget;
+      }
+      if (prevKey === undefined) {
+        delete process.env.STRIPE_SECRET_KEY_TEST_MODE_OVH;
+      } else {
+        process.env.STRIPE_SECRET_KEY_TEST_MODE_OVH = prevKey;
       }
     }
   });
