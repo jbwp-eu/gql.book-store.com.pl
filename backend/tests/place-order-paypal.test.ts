@@ -158,7 +158,7 @@ describe("placeOrder PayPal", () => {
     expect(enqueuedOrder.user.email).toContain("@test.pl");
   });
 
-  it("does not enqueue order confirmation email for unpaid Stripe placeOrder", async () => {
+  it("rejects placeOrder when Stripe payment intent does not exist", async () => {
     const token = await registerAndGetToken();
     const piId = `pi_unpaid_${Date.now()}`;
 
@@ -184,8 +184,8 @@ describe("placeOrder PayPal", () => {
       });
 
     expect(res.status).toBe(200);
-    expect(res.body.errors).toBeUndefined();
-    expect(res.body.data?.placeOrder?.isPaid).toBe(false);
+    expect(res.body.errors?.[0]?.path).toEqual(["placeOrder"]);
+    expect(res.body.data?.placeOrder).toBeFalsy();
     expect(enqueueOrderConfirmationEmail).not.toHaveBeenCalled();
   });
 });

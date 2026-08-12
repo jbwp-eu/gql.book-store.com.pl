@@ -21,7 +21,7 @@ import { makeT } from "./i18n/t.js";
 import { tryInsertStripeEventId } from "./models/stripeWebhookEvent.js";
 import { applyStripeWebhookEvent } from "./stripe/applyWebhookEvent.js";
 import { logger } from "./utils/logger.js";
-import { stripeEnv } from "./utils/stripeEnv.js";
+import { stripeEnv, stripeWebhookSecret } from "./utils/stripeEnv.js";
 
 const backendDir = path.dirname(fileURLToPath(import.meta.url));
 const frontendDistDir = path.join(backendDir, "../../frontend/dist");
@@ -121,7 +121,7 @@ app.post(
   (req, res) => {
     const rid = req.requestId;
     const signature = req.headers["stripe-signature"];
-    const webhookSecret = stripeEnv("STRIPE_WEBHOOK_SECRET_TEST_MODE");
+    const webhookSecret = stripeWebhookSecret();
     const stripeSecret = stripeEnv("STRIPE_SECRET_KEY_TEST_MODE");
 
     if (!signature || typeof signature !== "string") {

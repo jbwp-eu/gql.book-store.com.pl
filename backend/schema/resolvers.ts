@@ -61,7 +61,10 @@ import {
   capturePayPalOrder,
   createPayPalCheckoutOrder,
 } from "../utils/paypal.js";
-import { onOrderNewlyPaid } from "../utils/onOrderNewlyPaid.js";
+import {
+  onOrderNewlyPaid,
+  onStripeOrderNewlyPaid,
+} from "../utils/onOrderNewlyPaid.js";
 import StripeSDK from "stripe";
 import { stripeEnv } from "../utils/stripeEnv.js";
 
@@ -1114,14 +1117,55 @@ const root = {
       return withOrderItemImages(order);
     }
 
+    if (normalizedPaymentMethod === "stripe") {
+      if (!stripePaymentIntentId) {
+        throw new GraphQLError(t("stripePaymentIntentIdRequiredForPayment"));
+      }
+
+      const stripe = await getStripe(t);
+      let pi: StripeSDK.PaymentIntent;
+      try {
+        pi = await stripe.paymentIntents.retrieve(stripePaymentIntentId);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("paymentIntents.retrieve failed:", err);
+        throw new GraphQLError(t("stripePaymentIntentFailed"));
+      }
+
+      if (pi.status !== "succeeded") {
+        throw new GraphQLError(t("stripePaymentNotComplete"));
+      }
+
+      const expectedAmount = toMinorUnits(serverTotals.totalPrice);
+      if (pi.amount !== expectedAmount) {
+        throw new GraphQLError(t("stripeAmountMismatch"));
+      }
+      if (pi.currency.toLowerCase() !== CURRENCY) {
+        throw new GraphQLError(t("stripeCurrencyMismatch"));
+      }
+
+      const order = createOrder({
+        userId: currentUser.id,
+        items: resolvedItems,
+        shippingAddress: normalizedShippingAddress,
+        paymentMethod: normalizedPaymentMethod,
+        stripePaymentIntentId,
+        totalPrice: serverTotals.totalPrice,
+        t,
+      });
+
+      const paidResult = setOrderPaidByStripePaymentIntentId(stripePaymentIntentId);
+      onStripeOrderNewlyPaid(paidResult);
+      return withOrderItemImages(paidResult.order ?? order);
+    }
+
     return withOrderItemImages(
       createOrder({
         userId: currentUser.id,
         items: resolvedItems,
         shippingAddress: normalizedShippingAddress,
         paymentMethod: normalizedPaymentMethod,
-        stripePaymentIntentId:
-          normalizedPaymentMethod === "stripe" ? (stripePaymentIntentId ?? null) : null,
+        stripePaymentIntentId: null,
         totalPrice: serverTotals.totalPrice,
         t,
       })

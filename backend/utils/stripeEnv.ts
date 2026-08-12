@@ -14,3 +14,15 @@ export function stripeEnv(
   const trimmed = typeof value === "string" ? value.trim() : "";
   return trimmed || undefined;
 }
+
+/** Local `stripe listen` secret; used in dev only (production + tests use Dashboard OVH/AWS). */
+export function stripeWebhookSecret(): string | undefined {
+  const nodeEnv = process.env.NODE_ENV;
+  if (nodeEnv !== "production" && nodeEnv !== "test") {
+    const cli = process.env.STRIPE_WEBHOOK_SECRET_TEST_MODE_CLI?.trim();
+    if (cli) {
+      return cli;
+    }
+  }
+  return stripeEnv("STRIPE_WEBHOOK_SECRET_TEST_MODE");
+}

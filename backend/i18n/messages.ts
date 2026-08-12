@@ -66,6 +66,11 @@ export const resolverMessages = {
     paymentMethodRequired: "Payment method is required.",
     stripePaymentIntentIdNonEmpty:
       "stripePaymentIntentId must be a non-empty string.",
+    stripePaymentIntentIdRequiredForPayment:
+      "stripePaymentIntentId is required for Stripe payment.",
+    stripePaymentNotComplete: "Stripe payment is not complete.",
+    stripeCurrencyMismatch: "Stripe payment currency mismatch.",
+    stripeAmountMismatch: "Stripe payment amount mismatch.",
     paypalOrderIdNonEmpty: "paypalOrderId must be a non-empty string.",
     paypalOrderIdRequiredForPayment:
       "paypalOrderId is required for PayPal payment.",
@@ -153,6 +158,11 @@ export const resolverMessages = {
     paymentMethodRequired: "Wymagana jest metoda płatności.",
     stripePaymentIntentIdNonEmpty:
       "stripePaymentIntentId musi być niepustym ciągiem znaków.",
+    stripePaymentIntentIdRequiredForPayment:
+      "Dla płatności Stripe wymagany jest stripePaymentIntentId.",
+    stripePaymentNotComplete: "Płatność Stripe nie została zakończona.",
+    stripeCurrencyMismatch: "Niezgodność waluty płatności Stripe.",
+    stripeAmountMismatch: "Niezgodność kwoty płatności Stripe.",
     paypalOrderIdNonEmpty: "paypalOrderId musi być niepustym ciągiem znaków.",
     paypalOrderIdRequiredForPayment:
       "Dla płatności PayPal wymagany jest paypalOrderId.",
