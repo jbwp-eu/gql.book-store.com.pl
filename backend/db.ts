@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { randomUUID } from "node:crypto";
 import Database from "better-sqlite3";
 import path from "path";
 import { mkdirSync, existsSync } from "fs";
@@ -136,7 +137,19 @@ function seedProducts() {
   }
 }
 
-function seedOrders(): void {
+function assertProductionAdminPassword(): void {
+  if (process.env.NODE_ENV !== "production") return;
+  const password = process.env.ADMIN_PASSWORD?.trim() ?? "";
+  if (!password || password === "change-me" || password === "admin") {
+    throw new Error(
+      "ADMIN_PASSWORD must be set to a strong non-placeholder value in production"
+    );
+  }
+}
+
+assertProductionAdminPassword();
+
+function seedOrders(userId: string): void {
   const count = db.prepare("SELECT COUNT(*) as c FROM orders").get() as {
     c: number;
   };
@@ -146,10 +159,10 @@ function seedOrders(): void {
     INSERT INTO orders (id, user_id, created_at, total_price)
     VALUES (?, ?, ?, ?)
   `
-  ).run("1", "1", new Date().toISOString(), 100);
+  ).run("1", userId, new Date().toISOString(), 100);
 }
 
-function seedReviews(): void {
+function seedReviews(userId: string): void {
   const count = db.prepare("SELECT COUNT(*) as c FROM reviews").get() as {
     c: number;
   };
@@ -167,7 +180,7 @@ function seedReviews(): void {
     INSERT INTO reviews (id, user_id, product_id, rating, comment, created_at)
     VALUES (?, ?, ?, ?, ?, ?)
   `
-  ).run("1", "1", firstProduct.id, 5, "Great book!", new Date().toISOString());
+  ).run("1", userId, firstProduct.id, 5, "Great book!", new Date().toISOString());
 }
 
 async function seedUsers(): Promise<void> {
@@ -178,14 +191,28 @@ async function seedUsers(): Promise<void> {
 
   const adminPassword = process.env.ADMIN_PASSWORD ?? "admin";
   const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
+  const adminId = randomUUID();
   db.prepare(
     `
     INSERT INTO users (id, name, email, password, is_admin)
     VALUES (?, ?, ?, ?, ?)
   `
-  ).run("1", "Admin", "admin@test.pl", hashedAdminPassword, 1);
-  seedOrders();
-  seedReviews();
+  ).run(adminId, "Admin", "admin@test.pl", hashedAdminPassword, 1);
+  seedOrders(adminId);
+
+  // Public productReviews expose user.id — never attach the seeded review to admin.
+  if (process.env.NODE_ENV === "production") return;
+
+  const demoPassword = process.env.DEMO_USER_PASSWORD ?? "user123";
+  const hashedDemoPassword = await bcrypt.hash(demoPassword, 10);
+  const demoUserId = randomUUID();
+  db.prepare(
+    `
+    INSERT INTO users (id, name, email, password, is_admin)
+    VALUES (?, ?, ?, ?, ?)
+  `
+  ).run(demoUserId, "Demo", "user@test.pl", hashedDemoPassword, 0);
+  seedReviews(demoUserId);
 }
 
 seedProducts();

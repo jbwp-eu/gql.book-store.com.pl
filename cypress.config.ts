@@ -11,6 +11,8 @@ export default defineConfig({
       GRAPHQL_URL: "http://localhost:4000/graphql",
       ADMIN_EMAIL: "admin@test.pl",
       ADMIN_PASSWORD: "admin123",
+      DEMO_USER_EMAIL: "user@test.pl",
+      DEMO_USER_PASSWORD: "user123",
       TOKEN_KEY: "token",
     },
     viewportWidth: 1280,

@@ -1,5 +1,6 @@
 /**
- * Seeded DB creates a review for user 1 with comment "Great book!" (see backend/db.ts).
+ * Seeded DB creates a review for demo user `user@test.pl` (not admin)
+ * with comment "Great book!" (see backend/db.ts).
  */
 describe("my reviews: seeded review", () => {
   beforeEach(() => {
@@ -8,7 +9,10 @@ describe("my reviews: seeded review", () => {
         win.localStorage.clear();
       },
     });
-    cy.loginByApi();
+    cy.loginByApi({
+      email: Cypress.env("DEMO_USER_EMAIL"),
+      password: Cypress.env("DEMO_USER_PASSWORD"),
+    });
   });
 
   it("shows the seeded review comment", () => {

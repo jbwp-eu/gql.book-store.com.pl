@@ -74,7 +74,7 @@ describe("login mutation (pairs with backend login resolver)", () => {
               login: {
                 token: FAKE_TOKEN,
                 user: {
-                  id: "1",
+                  id: "11111111-1111-4111-8111-111111111111",
                   name: "Admin",
                   email: ADMIN_EMAIL,
                   isAdmin: true,

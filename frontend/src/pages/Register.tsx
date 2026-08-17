@@ -36,9 +36,7 @@ function getRegisterSchema(t: TFunction) {
       .refine((s) => emailRegex.test(s), {
         message: t("auth.validation.emailInvalid"),
       }),
-    password: z
-      .string()
-      .min(6, { message: t("profile.errors.passwordShort") }),
+    password: z.string().min(6, { message: t("profile.errors.passwordShort") }),
   });
 }
 
@@ -91,8 +89,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (json.errors) {
     return {
-      error:
-        json.errors[0]?.message ?? serverT("auth.registrationFailed", lng),
+      error: json.errors[0]?.message ?? serverT("auth.registrationFailed", lng),
     };
   }
   const payload = json.data?.register;

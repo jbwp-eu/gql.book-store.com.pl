@@ -1,5 +1,5 @@
 /**
- * Seeded DB (`db.ts`) creates order id "1" for user id "1" (admin).
+ * Seeded DB (`db.ts`) creates order id "1" for the seeded admin (UUID id).
  * Admin sees the order details heading (not "thank you").
  */
 describe("order detail: seeded order", () => {

@@ -7,6 +7,7 @@ import { makeT } from "../i18n/t.js";
 describe("setOrderPaidByStripePaymentIntentId", () => {
   let setOrderPaidByStripePaymentIntentId: (typeof import("../models/order.js"))["setOrderPaidByStripePaymentIntentId"];
   let createOrder: (typeof import("../models/order.js"))["createOrder"];
+  let adminUserId: string;
 
   beforeAll(async () => {
     const dbPath = path.join(
@@ -26,6 +27,10 @@ describe("setOrderPaidByStripePaymentIntentId", () => {
     ({ setOrderPaidByStripePaymentIntentId, createOrder } = await import(
       "../models/order.js"
     ));
+    const { findUserByEmail } = await import("../models/user.js");
+    const admin = findUserByEmail("admin@test.pl");
+    if (!admin) throw new Error("seeded admin missing");
+    adminUserId = admin.id;
   });
 
   it("returns newlyPaid true only on first payment", () => {
@@ -33,7 +38,7 @@ describe("setOrderPaidByStripePaymentIntentId", () => {
     const piId = `pi_newly_${Date.now()}`;
 
     const order = createOrder({
-      userId: "1",
+      userId: adminUserId,
       items: [
         {
           productId: "aptekarka",

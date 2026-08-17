@@ -73,6 +73,7 @@ describe("Stripe webhooks HTTP", () => {
   let db: (typeof import("../db.js"))["db"];
   let createOrder: (typeof import("../models/order.js"))["createOrder"];
   let findProductById: (typeof import("../models/product.js"))["findProductById"];
+  let adminUserId: string;
 
   beforeAll(async () => {
     const dbPath = path.join(
@@ -98,6 +99,10 @@ describe("Stripe webhooks HTTP", () => {
     await dbReady;
     ({ createOrder } = await import("../models/order.js"));
     ({ findProductById } = await import("../models/product.js"));
+    const { findUserByEmail } = await import("../models/user.js");
+    const admin = findUserByEmail("admin@test.pl");
+    if (!admin) throw new Error("seeded admin missing");
+    adminUserId = admin.id;
   });
 
   beforeEach(() => {
@@ -152,7 +157,7 @@ describe("Stripe webhooks HTTP", () => {
     const piId = `pi_fail_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 
     const order = createOrder({
-      userId: "1",
+      userId: adminUserId,
       items: [
         {
           productId: "aptekarka",
@@ -210,7 +215,7 @@ describe("Stripe webhooks HTTP", () => {
     // Use same catalog line as other tests in this file so stock stays consistent
     // when this suite shares a Node module cache / DB with other backend tests.
     const order = createOrder({
-      userId: "1",
+      userId: adminUserId,
       items: [
         {
           productId: "aptekarka",
@@ -270,7 +275,7 @@ describe("Stripe webhooks HTTP", () => {
     const piId = `pi_both_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 
     const order = createOrder({
-      userId: "1",
+      userId: adminUserId,
       items: [
         {
           productId: "aptekarka",
@@ -338,7 +343,7 @@ describe("Stripe webhooks HTTP", () => {
     );
 
     createOrder({
-      userId: "1",
+      userId: adminUserId,
       items: [
         {
           productId: "aptekarka",

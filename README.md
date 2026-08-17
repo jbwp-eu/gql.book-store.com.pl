@@ -77,3 +77,53 @@ Inne skrypty:
 ## Deploy
 
 Zobacz [DEPLOY.md](DEPLOY.md) — EC2 v1 / EC2 v2 / OVH (wspólny layout `/var/www/gql-book-store`).
+
+## Klucze AWS dla OVH (`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`)
+
+Na **OVH** (i lokalnie, jeśli testujesz kolejkę SQS) backend wysyła maile potwierdzenia zamówienia przez **SQS** — nie ma tam roli IAM jak na EC2, więc potrzebujesz **użytkownika IAM** z kluczem dostępu (tylko `sqs:SendMessage`).
+
+Pełna konfiguracja SQS + Lambda: [deploy-ver.2/order-confirmation-lambda.md](deploy-ver.2/order-confirmation-lambda.md). Poniżej samo utworzenie kluczy.
+
+### Wymagania w `.env`
+
+```env
+ORDER_CONFIRMATION_QUEUE_URL=https://sqs.eu-central-1.amazonaws.com/TWOJE_KONTO/NAZWA_KOLEJKI
+AWS_REGION=eu-central-1
+AWS_ACCESS_KEY_ID=AKIA...
+AWS_SECRET_ACCESS_KEY=...
+```
+
+Na **EC2** zostaw klucze puste — używana jest rola instancji.
+
+### Kroki w AWS Console
+
+1. **SQS** — utwórz kolejkę (jeśli jeszcze nie ma) i skopiuj **Queue URL** (patrz [order-confirmation-lambda.md](deploy-ver.2/order-confirmation-lambda.md#step-1-sqs-queue)).
+2. **IAM** → **Policies** → **Create policy** → JSON (podmień `YOUR_ACCOUNT_ID` i nazwę kolejki):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "sqs:SendMessage",
+      "Resource": "arn:aws:sqs:eu-central-1:YOUR_ACCOUNT_ID:gql-book-store-order-confirmation"
+    }
+  ]
+}
+```
+
+3. Nazwa polityki np. `gql-book-store-sqs-send-order-confirmation` → **Create policy**.
+4. **IAM** → **Users** → **Create user** (np. `gql-book-store-ovh-sqs`).
+5. **Attach policies directly** → wybierz utworzoną politykę (bez uprawnień konsoli / AdministratorAccess).
+6. Po utworzeniu użytkownika: **Security credentials** → **Create access key**.
+7. Typ: **Application running outside AWS** (VPS OVH / lokalny dev).
+8. Skopiuj **Access key ID** (`AKIA...`) i **Secret access key** — secret widać **tylko raz**.
+9. Wklej do `.env` (lokalnie) lub `/var/www/gql-book-store/shared/.env.production` (OVH). **Nie commituj** kluczy do repo.
+10. Restart: `sudo systemctl restart gql-book-store` (OVH) lub restart `npm run dev` (lokalnie).
+
+### Weryfikacja
+
+Po opłaceniu zamówienia w logach backendu powinno być: `order confirmation email enqueued`. W CloudWatch (Lambda) — udane wywołanie po konsumpcji wiadomości z SQS.
+
+Szczegóły deploy OVH: [deploy-ovh/README.md](deploy-ovh/README.md).

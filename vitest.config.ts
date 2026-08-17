@@ -23,6 +23,7 @@ export default defineConfig({
           root: ".",
           include: ["backend/tests/**/*.test.ts"],
           environment: "node",
+          setupFiles: ["backend/tests/setup.ts"],
         },
       },
       {
