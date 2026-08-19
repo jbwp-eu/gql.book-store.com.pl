@@ -116,6 +116,7 @@ describe("placeOrder PayPal", () => {
       .post("/graphql")
       .set("Content-Type", "application/json")
       .set("Authorization", `Bearer ${token}`)
+      .set("X-App-Locale", "pl")
       .send({
         query: `mutation PlaceOrder($input: PlaceOrderInput!) {
           placeOrder(input: $input) {
@@ -147,6 +148,7 @@ describe("placeOrder PayPal", () => {
     expect(capturePayPalOrder).toHaveBeenCalledTimes(1);
     expect(capturePayPalOrder).toHaveBeenCalledWith("PAYPAL_ORDER_123");
     expect(enqueueOrderConfirmationEmail).toHaveBeenCalledTimes(1);
+    expect(enqueueOrderConfirmationEmail.mock.calls[0][1]).toBe("pl");
     const enqueuedOrder = enqueueOrderConfirmationEmail.mock.calls[0][0];
     expect(enqueuedOrder).toMatchObject({
       id: order!.id,

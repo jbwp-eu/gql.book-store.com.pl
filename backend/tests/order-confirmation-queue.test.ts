@@ -86,8 +86,22 @@ describe("orderConfirmationQueue", () => {
       totalPrice: 99.5,
       currency: "PLN",
       paidAt: "2026-01-01T01:00:00.000Z",
+      language: "pl",
     });
     expect(body.items).toHaveLength(1);
     expect(body.shippingAddress.city).toBe("Warsaw");
+  });
+
+  it("sends language en when requested", async () => {
+    process.env.ORDER_CONFIRMATION_QUEUE_URL =
+      "https://sqs.eu-central-1.amazonaws.com/123/gql-book-store-order-confirmation";
+
+    const { enqueueOrderConfirmationEmail } = await import(
+      "../utils/orderConfirmationQueue.js"
+    );
+    await enqueueOrderConfirmationEmail(sampleOrder, "en");
+
+    const input = send.mock.calls[0][0] as { MessageBody: string };
+    expect(JSON.parse(input.MessageBody).language).toBe("en");
   });
 });

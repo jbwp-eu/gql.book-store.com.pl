@@ -1113,7 +1113,7 @@ const root = {
         totalPrice: serverTotals.totalPrice,
         t,
       });
-      onOrderNewlyPaid(order);
+      onOrderNewlyPaid(order, context.locale === "en" ? "en" : "pl");
       return withOrderItemImages(order);
     }
 
@@ -1155,7 +1155,10 @@ const root = {
       });
 
       const paidResult = setOrderPaidByStripePaymentIntentId(stripePaymentIntentId);
-      onStripeOrderNewlyPaid(paidResult);
+      onStripeOrderNewlyPaid(
+        paidResult,
+        context.locale === "en" ? "en" : "pl"
+      );
       return withOrderItemImages(paidResult.order ?? order);
     }
 

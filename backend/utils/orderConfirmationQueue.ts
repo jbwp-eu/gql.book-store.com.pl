@@ -18,6 +18,7 @@ export type OrderConfirmationMessage = {
     city: string;
     country: string;
   };
+  language: "pl" | "en";
 };
 
 let sqsClient: SQSClient | null = null;
@@ -45,7 +46,12 @@ function getSqsClient(): SQSClient {
   return sqsClient;
 }
 
-export function orderToConfirmationMessage(order: Order): OrderConfirmationMessage | null {
+export type OrderEmailLanguage = "pl" | "en";
+
+export function orderToConfirmationMessage(
+  order: Order,
+  language: OrderEmailLanguage = "pl"
+): OrderConfirmationMessage | null {
   const userEmail = order.user.email?.trim();
   if (!userEmail) {
     return null;
@@ -74,16 +80,20 @@ export function orderToConfirmationMessage(order: Order): OrderConfirmationMessa
       city: order.shippingAddress.city,
       country: order.shippingAddress.country,
     },
+    language: language === "en" ? "en" : "pl",
   };
 }
 
-export async function enqueueOrderConfirmationEmail(order: Order): Promise<void> {
+export async function enqueueOrderConfirmationEmail(
+  order: Order,
+  language: "pl" | "en" = "pl"
+): Promise<void> {
   const queueUrl = getQueueUrl();
   if (!queueUrl) {
     return;
   }
 
-  const message = orderToConfirmationMessage(order);
+  const message = orderToConfirmationMessage(order, language);
   if (!message) {
     logger.warn("order confirmation email skipped: no customer email", {
       orderId: order.id,

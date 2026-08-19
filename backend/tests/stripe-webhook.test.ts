@@ -266,7 +266,8 @@ describe("Stripe webhooks HTTP", () => {
         id: order.id,
         isPaid: true,
         user: expect.objectContaining({ email: expect.any(String) }),
-      })
+      }),
+      "pl"
     );
   });
 
@@ -330,7 +331,8 @@ describe("Stripe webhooks HTTP", () => {
 
     expect(enqueueOrderConfirmationEmail).toHaveBeenCalledTimes(1);
     expect(enqueueOrderConfirmationEmail).toHaveBeenCalledWith(
-      expect.objectContaining({ id: order.id })
+      expect.objectContaining({ id: order.id }),
+      "pl"
     );
   });
 

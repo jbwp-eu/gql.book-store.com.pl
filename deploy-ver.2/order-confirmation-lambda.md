@@ -42,7 +42,29 @@ For deploy **v2** only ([README.md](README.md)). Uses the same paths as v2 (`/va
 ```
 
 2. Name: `gql-book-store-sqs-send-order-confirmation`
-3. Attach to the **EC2 instance IAM role** (recommended for v2; no access keys on the server)
+3. Attach the policy to the **EC2 instance IAM role** (recommended for v2; no access keys on the server). Do **not** attach it to the Lambda role from Step 2. On EC2 leave `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` empty — the SDK uses the instance role.
+
+   **A. Find or create the instance role**
+
+   1. **EC2** → **Instances** → instance `gql-book-store` → **Security** tab.
+   2. Check **IAM role**.
+   3. If a role is **already set** — note its name and go to B.
+   4. If there is **none** (common in v2; launch does not create a role):
+      - **IAM** → **Roles** → **Create role**
+      - Trusted entity: **AWS service** → **EC2** (not Lambda)
+      - Permissions: skip for now — the SQS policy is attached in B
+      - Name e.g. `gql-book-store-ec2-role` → **Create role**
+      - **EC2** → instance → **Actions** → **Security** → **Modify IAM role**
+      - Select `gql-book-store-ec2-role` → **Update IAM role**
+
+   **B. Attach the SQS send policy to that role**
+
+   1. **IAM** → **Roles** → open the role from A (`gql-book-store-ec2-role` or the existing one).
+   2. **Permissions** → **Add permissions** → **Attach policies**.
+   3. Search `gql-book-store-sqs-send-order-confirmation`.
+   4. Select it → **Add permissions**.
+
+   Do not attach `AWSLambdaSQSQueueExecutionRole` here.
 
 ### OVH VPS (access keys)
 
@@ -56,6 +78,7 @@ AWS_SECRET_ACCESS_KEY=...
 ```
 
 Restart `gql-book-store` after editing. Do not commit these keys.
+
 ## Step 4: Lambda function
 
 1. **Lambda** → **Create function** → Node.js **20.x**, x86_64

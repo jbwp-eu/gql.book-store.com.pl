@@ -73,6 +73,7 @@ Inne skrypty:
 | `npm test` | Vitest |
 | `npm run e2e:run` | Cypress headless |
 | `npm run e2e:open` | Cypress UI |
+| `npm run lambda:package:order-email` | paczka ZIP do wgrania w AWS Lambda |
 
 ## Deploy
 
@@ -127,3 +128,44 @@ Na **EC2** zostaw klucze puste — używana jest rola instancji.
 Po opłaceniu zamówienia w logach backendu powinno być: `order confirmation email enqueued`. W CloudWatch (Lambda) — udane wywołanie po konsumpcji wiadomości z SQS.
 
 Szczegóły deploy OVH: [deploy-ovh/README.md](deploy-ovh/README.md).
+
+## Wgranie funkcji Lambda w AWS Console
+
+Mail potwierdzenia zamówienia to funkcja `gql-book-store-order-confirmation-email` (kod w `lambda/order-confirmation-email/`). Pełna konfiguracja SQS + IAM: [order-confirmation-lambda.md](deploy-ver.2/order-confirmation-lambda.md). Poniżej: **spakowanie ZIP-a i wstawienie kodu w konsoli**.
+
+### 1. Paczka ZIP (lokalnie)
+
+Z katalogu głównego repo (`gql.book-store.com.pl/`):
+
+```bash
+npm run lambda:package:order-email
+```
+
+Powstanie plik `lambda/order-confirmation-email/function.zip` (handler: `index.handler`). Na Windowsie skrypt używa PowerShell `Compress-Archive` — osobny program `zip` nie jest potrzebny.
+
+### 2. Nowa funkcja (jeśli jeszcze nie istnieje)
+
+1. AWS Console → region **eu-central-1** → **Lambda** → **Create function**.
+2. **Author from scratch**.
+3. Function name: `gql-book-store-order-confirmation-email`.
+4. Runtime: **Node.js 20.x**, Architecture: **x86_64**.
+5. Execution role: istniejąca rola `gql-book-store-order-email-lambda-role` (z polityką `AWSLambdaSQSQueueExecutionRole`).
+6. **Create function**.
+7. **Configuration** → **General configuration** → **Edit**: timeout **30 s**, memory **256 MB**.
+8. **Configuration** → **Environment variables** — te same wartości SMTP co na serwerze, m.in.: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_SECURE`, `EMAIL_FROM`, opcjonalnie `CURRENCY`, `STORE_NAME`.
+9. **Add trigger** → **SQS** → kolejka `gql-book-store-order-confirmation`, batch size **1**.
+
+### 3. Wgranie (lub aktualizacja) kodu
+
+1. Otwórz funkcję **gql-book-store-order-confirmation-email**.
+2. Zakładka **Code**.
+3. **Upload from** → **.zip file**.
+4. Wybierz `lambda/order-confirmation-email/function.zip` → **Save**.
+5. Sprawdź **Runtime settings** → **Handler**: `index.handler` (plik `index.mjs` w ZIP-ie).
+6. **Deploy** (jeśli konsola o to poprosi po zapisie).
+
+Limit rozmiaru ZIP-a w konsoli to **50 MB**. Ta funkcja (tylko `nodemailer`) mieści się bez S3.
+
+### 4. Test w konsoli
+
+**Test** → szablon zdarzenia SQS. Ciało wiadomości: `lambda/order-confirmation-email/test-event.json`. Po opłaceniu zamówienia w CloudWatch powinna pojawić się udana inwokacja.
